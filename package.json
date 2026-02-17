@@ -1,0 +1,33 @@
+{
+  "name": "simple-expense-app",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/brian-b-tran/simple-budget-tracker#readme",
+  "bugs": {
+    "url": "https://github.com/brian-b-tran/simple-budget-tracker/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brian-b-tran/simple-budget-tracker.git"
+  },
+  "license": "MIT",
+  "author": "brian-b-tran",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "eslint": "^10.0.0",
+    "prettier": "^3.8.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
