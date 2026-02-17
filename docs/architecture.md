@@ -48,48 +48,36 @@ Infra
 
 ## 2. Tech Stack
 
-Frontend:
+### Frontend:
+- React Native (Expo)
+- React Native Web
+- NativeWind/Tailwind
+- shadcn/ui (web)
+- TypeScript
 
-    React Native (Expo)
+### Backend:
 
-    React Native Web
+- Node.js + Express
 
-    NativeWind/Tailwind
+- TypeScript
 
-    shadcn/ui (web)
+- Zod for validation
 
-    TypeScript
+- JWT + OAuth for authentication
 
-Backend:
+### Database:
 
-    Node.js + Express
+- PostgreSQL
+- Sequelize/TypeORM or Prisma (optional ORM)
 
-    TypeScript
+### Auth:
+- JWT access & refresh tokens
+- Multi-device session handling
 
-    Zod for validation
-
-    JWT + OAuth for authentication
-
-Database:
-
-    PostgreSQL
-
-    Sequelize/TypeORM or Prisma (optional ORM)
-
-Auth:
-
-    JWT access & refresh tokens
-
-    Multi-device session handling
-
-DevOps:
-
-    Docker + Docker Compose
-
-    GitHub Actions for CI/CD
-
-    Logging & monitoring (future)
-
+### DevOps:
+- Docker + Docker Compose
+- GitHub Actions for CI/CD
+- Logging & monitoring (future)
 
 ---
 
