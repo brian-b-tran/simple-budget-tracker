@@ -48,6 +48,7 @@ A cross-platform application to track personal expenses, manage monthly budgets,
 ---
 
 ## Project Structure (Monorepo)
+```
 expense-tracker/
 │
 ├─ apps/
@@ -65,7 +66,7 @@ expense-tracker/
 ├─ docker/              # Dockerfile and Compose
 │
 └─ docs/                # Documentation: PRD, architecture, domain models
-
+```
 ---
 
 # Monorepo Workflow & Getting Started
@@ -208,3 +209,52 @@ npm run dev:all
 - Mobile app (Expo) can be previewed on device or simulator.
 - Backend API runs at `http://localhost:3000` by default.
 - Web app runs at `http://localhost:19006` (Expo Web) or similar.
+
+---
+# Milestones
+| #   | Milestone                         | Goal                                      |
+| --- | --------------------------------- | ----------------------------------------- |
+| 1   | Project Foundation                | Setup monorepo, Docker, Postgres          |
+| 2   | Authentication & Sessions         | JWT + refresh tokens, multi-device login  |
+| 3   | Core Expense System               | CRUD for expenses & categories            |
+| 4   | Currency & Exchange Rates         | Multi-currency normalization              |
+| 5   | Budget System                     | Monthly, vacation, and event budgets      |
+| 6   | Recurring Expenses + Worker       | Auto-generation of expenses               |
+| 7   | Reminders & Calendar              | Time-based alerts & calendar support      |
+| 8   | Frontend MVP (Mobile First)       | Expo app, expense entry, dashboard        |
+| 9   | Web App                           | Desktop analytics + planning              |
+| 10  | Design System & UI Infrastructure | Shared tokens, colors, typography         |
+| 11  | Production Infrastructure         | Docker production, cloud Postgres         |
+| 12  | CI/CD & Quality                   | Pipelines, linting, type checks, tests    |
+| 13  | Security Hardening                | Rate limiting, secure sessions            |
+| 14  | Observability & Scaling           | Logging, metrics, monitoring              |
+| 15  | Future Enhancements               | Savings goals, notifications, AI insights |
+
+# Domain Models
+
+Refer to [docs/domain_models.md](docs/domain_models.md) for the full ERD, tables, and relationships.
+
+---
+
+# Contributing
+
+1. Fork the repository
+2. Create a feature branch:
+
+   ```
+   git checkout -b feat/issue-123
+   ```
+
+3. Commit changes referencing GitHub issues:
+
+   ```
+   git commit -m "Issue #123: Implement expense CRUD"
+   ```
+
+4. Push your branch and open a Pull Request
+
+---
+
+# License
+
+MIT © 2026
