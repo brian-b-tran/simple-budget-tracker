@@ -1,0 +1,33 @@
+
+
+services:
+
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/expense_tracker
+    depends_on:
+      - db
+    volumes:
+      - ./services/api/src:/app/src      # only mount src, keep node_modules inside container
+      - ./services/api/tsconfig.json:/app/tsconfig.json
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: expense_tracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

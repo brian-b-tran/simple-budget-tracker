@@ -4,23 +4,20 @@
   "version": "1.0.0",
   "description": "Expense & Vacation Budget Tracker",
   "license": "MIT",
-
   "workspaces": [
     "apps/*",
     "services/*",
     "packages/*"
   ],
-
   "scripts": {
     "dev:api": "npm run dev --workspace=services/api",
     "build:api": "npm run build --workspace=services/api",
     "start:api": "npm run start --workspace=services/api",
-
     "lint": "eslint .",
     "format": "prettier --write ."
   },
-
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "eslint": "^10.0.0",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3"
