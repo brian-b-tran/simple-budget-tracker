@@ -1,33 +1,28 @@
 {
-  "name": "simple-expense-app",
+  "name": "simple-expense-tracker",
+  "private": true,
   "version": "1.0.0",
-  "description": "",
-  "homepage": "https://github.com/brian-b-tran/simple-budget-tracker#readme",
-  "bugs": {
-    "url": "https://github.com/brian-b-tran/simple-budget-tracker/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/brian-b-tran/simple-budget-tracker.git"
-  },
+  "description": "Expense & Vacation Budget Tracker",
   "license": "MIT",
-  "author": "brian-b-tran",
-  "type": "commonjs",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
+
   "workspaces": [
     "apps/*",
+    "services/*",
     "packages/*"
   ],
+
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:api": "npm run dev --workspace=services/api",
+    "build:api": "npm run build --workspace=services/api",
+    "start:api": "npm run start --workspace=services/api",
+
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
+
   "devDependencies": {
     "eslint": "^10.0.0",
     "prettier": "^3.8.1",
-    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
 }
