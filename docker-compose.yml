@@ -13,9 +13,8 @@ services:
     depends_on:
       - db
     volumes:
-      - ./services/api/src:/app/src      
-      - ./services/api/tsconfig.json:/app/tsconfig.json
-      - ./services/api/.env:/app/.env
+      - ./services/api:/app
+      - /app/node_modules
 
   db:
     image: postgres:15-alpine

@@ -1,22 +1,19 @@
+import { env } from './config/env';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import { env } from './env';
-dotenv.config();
-
+import healthRoutes from './routes/healthRoutes';
 const app = express();
 
+//middleware
 app.use(cors());
 app.use(express.json());
 
-app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'ok' });
+//routes
+app.use('/health', healthRoutes);
+app.use('/', async (req: Request, res: Response): Promise<void> => {
+  res.json({ message: 'Expense API.' });
 });
-
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Expense Tracker API is running.' });
-});
-
+//start
 app.listen(env.PORT, () => {
   console.log(`API running on port ${env.PORT} in ${env.NODE_ENV} mode`);
 });
