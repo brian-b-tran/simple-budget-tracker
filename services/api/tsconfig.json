@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "target": "ES2023",                  
-    "module": "ESNext",                
+    "module": "CommonJS",                
     "outDir": "dist",                     
-    "rootDir": "src",                     
+    "rootDir": ".",                     
     "strict": true,                       
     "esModuleInterop": true,
     "ignoreDeprecations": "5.0" ,              
@@ -14,6 +14,6 @@
     "resolveJsonModule": true,
     "sourceMap": true   
   },
-  "include": ["src"],
+  "include": ["src", "src/config/env.ts"],
   "exclude": ["node_modules", "dist"],
 }
