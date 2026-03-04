@@ -1,6 +1,11 @@
 import { Request, Response } from 'express';
-import { registerUser } from '../services/authServices';
+import {
+  registerUserService,
+  loginUserService,
+} from '../services/authServices';
 import z from 'zod';
+import { access } from 'node:fs';
+import { env } from '../config/env';
 
 const userRegisterSchema = z.object({
   email: z.email().min(1),
@@ -23,11 +28,47 @@ export async function registerUserController(
     res.status(400).json({ Error: result.error });
   } else {
     try {
-      const newUser = await registerUser(
+      const newUser = await registerUserService(
         result.data.email,
         result.data.password
       );
       res.status(201).json({ message: 'registered.', user: newUser });
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  }
+}
+
+const userLoginSchema = z.object({
+  email: z.email(),
+  password: z.string().min(1),
+});
+
+export async function loginUserController(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const result = userLoginSchema.safeParse(req.body);
+
+  if (!result.success) {
+    res.status(400).json({ Error: result.error });
+  } else {
+    try {
+      const tokens = await loginUserService(
+        result.data.email,
+        result.data.password
+      );
+      res.cookie('refreshToken', tokens[1], {
+        httpOnly: true,
+        secure: env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+      });
+      res.status(200).json({ message: 'Logged In.', access: tokens[0] });
     } catch (error) {
       if (error instanceof Error) {
         res.status(400).json({ message: error.message });
