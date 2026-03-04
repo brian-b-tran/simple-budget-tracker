@@ -4,7 +4,6 @@ import {
   loginUserService,
 } from '../services/authServices';
 import z from 'zod';
-import { access } from 'node:fs';
 import { env } from '../config/env';
 
 const userRegisterSchema = z.object({
