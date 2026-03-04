@@ -1,7 +1,9 @@
 import { env } from './config/env';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import healthRoutes from './routes/healthRoutes';
+import healthRouter from './routes/healthRoutes';
+import authRouter from './routes/authRoutes';
+
 import prisma from './config/db';
 const app = express();
 
@@ -10,7 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 //routes
-app.use('/health', healthRoutes);
+app.use('/health', healthRouter);
+app.use('/auth', authRouter);
 app.use('/', async (req: Request, res: Response): Promise<void> => {
   res.json({ message: 'Expense API.' });
 });

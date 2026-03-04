@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({
+  path: process.env.NODE_ENV === 'production' ? '.env' : '.env.local',
+});
 
 const envSchema = z.object({
   PORT: z.string().transform(Number).default(3000),
