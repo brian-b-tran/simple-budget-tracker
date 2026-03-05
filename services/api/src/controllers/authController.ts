@@ -151,3 +151,7 @@ export async function logoutAllUserController(
     }
   }
 }
+
+export function meController(req: Request, res: Response): void {
+  res.status(200).json({ user: req.user });
+}

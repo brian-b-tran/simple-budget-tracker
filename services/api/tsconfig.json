@@ -12,8 +12,10 @@
     "noImplicitAny": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "sourceMap": true   
+    "sourceMap": true   ,
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
   "include": ["src", "src/config/env.ts"],
-  "exclude": ["node_modules", "dist"],
+  "files": ["src/types/express.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }

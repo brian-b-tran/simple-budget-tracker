@@ -7,6 +7,11 @@ export interface RefreshTokenPayload {
   email: string;
   type: string;
 }
+export interface AccessTokenPayload {
+  sub: string;
+  email: string;
+  type: string;
+}
 
 export function generateAccessToken(userId: string, email: string): string {
   const payload = { sub: userId, email: email, type: 'access' };
@@ -38,4 +43,9 @@ export function generateRefreshToken(
 export function verifyRefreshToken(token: string): RefreshTokenPayload {
   const payload = jwt.verify(token, env.JWT_REFRESH_SECRET);
   return payload as RefreshTokenPayload;
+}
+
+export function verifyAccessToken(token: string): AccessTokenPayload {
+  const payload = jwt.verify(token, env.JWT_ACCESS_SECRET);
+  return payload as AccessTokenPayload;
 }
