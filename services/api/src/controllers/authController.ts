@@ -4,6 +4,7 @@ import {
   loginUserService,
   refreshTokensService,
   logoutUserService,
+  logoutAllUserService,
 } from '../services/authServices';
 import z from 'zod';
 import { env } from '../config/env';
@@ -107,7 +108,10 @@ export async function refreshTokensController(
   }
 }
 
-export async function logoutUserController(req: Request, res: Response) {
+export async function logoutUserController(
+  req: Request,
+  res: Response
+): Promise<void> {
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
     res.status(401).json({ message: 'No refresh token provided' });
@@ -115,6 +119,28 @@ export async function logoutUserController(req: Request, res: Response) {
   }
   try {
     await logoutUserService(refreshToken);
+    res.clearCookie('refreshToken');
+    res.status(200).json({ message: 'Logged out.' });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+}
+
+export async function logoutAllUserController(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    res.status(401).json({ message: 'No refresh token provided' });
+    return;
+  }
+  try {
+    await logoutAllUserService(refreshToken);
     res.clearCookie('refreshToken');
     res.status(200).json({ message: 'Logged out.' });
   } catch (error) {

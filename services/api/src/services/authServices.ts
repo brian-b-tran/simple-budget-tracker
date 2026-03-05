@@ -131,3 +131,16 @@ export async function logoutUserService(refreshToken: string): Promise<void> {
     },
   });
 }
+
+export async function logoutAllUserService(
+  refreshToken: string
+): Promise<void> {
+  const payload = verifyRefreshToken(refreshToken);
+  await prisma.session.updateMany({
+    where: { userId: payload.sub },
+    data: {
+      revoked: true,
+      revokedAt: new Date(),
+    },
+  });
+}
