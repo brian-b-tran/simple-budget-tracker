@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import {
   registerUserService,
   loginUserService,
-  refreshTokens,
+  refreshTokensService,
 } from '../services/authServices';
 import z from 'zod';
 import { env } from '../config/env';
@@ -89,7 +89,7 @@ export async function refreshTokensController(
     return;
   }
   try {
-    const [access, refresh] = await refreshTokens(refreshToken);
+    const [access, refresh] = await refreshTokensService(refreshToken);
     res.cookie('refreshToken', refresh, {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
@@ -104,4 +104,8 @@ export async function refreshTokensController(
       res.status(500).json({ message: 'Internal server error' });
     }
   }
+}
+
+export async function logoutUserController(refreshToken: string) {
+  lo;
 }

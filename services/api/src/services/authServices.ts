@@ -113,3 +113,20 @@ export async function refreshTokens(
 
   return [newAccessToken, newRefreshToken];
 }
+
+export async function logoutUser(refreshToken: string): Promise<void> {
+  const payload = verifyRefreshToken(refreshToken);
+  const currentSession = await prisma.session.findUnique({
+    where: { id: payload.sessionId },
+  });
+  if (!currentSession) {
+    throw new Error('Session Invalid');
+  }
+  await prisma.session.update({
+    where: { id: payload.sessionId },
+    data: {
+      revoked: true,
+      revokedAt: new Date(),
+    },
+  });
+}
