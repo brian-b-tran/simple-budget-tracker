@@ -69,7 +69,7 @@ export async function loginUserService(
   return [accessToken, refreshToken];
 }
 
-export async function refreshTokens(
+export async function refreshTokensService(
   refreshToken: string
 ): Promise<[string, string]> {
   const payload = verifyRefreshToken(refreshToken);
@@ -114,7 +114,7 @@ export async function refreshTokens(
   return [newAccessToken, newRefreshToken];
 }
 
-export async function logoutUser(refreshToken: string): Promise<void> {
+export async function logoutUserService(refreshToken: string): Promise<void> {
   const payload = verifyRefreshToken(refreshToken);
   const currentSession = await prisma.session.findUnique({
     where: { id: payload.sessionId },
@@ -122,6 +122,7 @@ export async function logoutUser(refreshToken: string): Promise<void> {
   if (!currentSession) {
     throw new Error('Session Invalid');
   }
+  if (currentSession.revoked) return;
   await prisma.session.update({
     where: { id: payload.sessionId },
     data: {
