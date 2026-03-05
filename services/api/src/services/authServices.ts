@@ -1,8 +1,13 @@
 import { User } from '../../generated/prisma/client';
 import prisma from '../config/db';
 import bcrypt from 'bcrypt';
-import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from '../utils/jwt';
 import { v4 as uuidv4 } from 'uuid';
+import type { RefreshTokenPayload } from '../utils/jwt';
 
 export async function registerUserService(
   email: string,
@@ -46,7 +51,7 @@ export async function loginUserService(
   const accessToken = generateAccessToken(user.id, user.email);
 
   const sessionId = uuidv4();
-  const refreshToken = generateRefreshToken(user.id, sessionId);
+  const refreshToken = generateRefreshToken(user.id, sessionId, user.email);
   const refreshHash = await bcrypt.hash(refreshToken, 10);
 
   let date = new Date();
@@ -62,4 +67,49 @@ export async function loginUserService(
   });
 
   return [accessToken, refreshToken];
+}
+
+export async function refreshTokens(
+  refreshToken: string
+): Promise<[string, string]> {
+  const payload = verifyRefreshToken(refreshToken);
+  const currentSession = await prisma.session.findUnique({
+    where: { id: payload.sessionId },
+  });
+  let date = new Date();
+  if (
+    !currentSession ||
+    currentSession.revoked ||
+    currentSession.expiresAt.getTime() < date.getTime()
+  ) {
+    throw new Error('Session Invalid');
+  }
+  const result = await bcrypt.compare(
+    refreshToken,
+    currentSession.refreshTokenHash
+  );
+
+  if (!result) {
+    throw new Error('Session Invalid');
+  }
+
+  const newAccessToken = generateAccessToken(payload.sub, payload.email);
+  const newRefreshToken = generateRefreshToken(
+    payload.sub,
+    payload.sessionId,
+    payload.email
+  );
+  const newRefreshHash = await bcrypt.hash(newRefreshToken, 10);
+
+  date.setDate(date.getDate() + 7);
+
+  await prisma.session.update({
+    where: { id: payload.sessionId },
+    data: {
+      refreshTokenHash: newRefreshHash,
+      expiresAt: date,
+    },
+  });
+
+  return [newAccessToken, newRefreshToken];
 }

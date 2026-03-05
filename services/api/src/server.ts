@@ -1,5 +1,6 @@
 import { env } from './config/env';
 import express, { Request, Response } from 'express';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import healthRouter from './routes/healthRoutes';
 import authRouter from './routes/authRoutes';
@@ -10,7 +11,7 @@ const app = express();
 //middleware
 app.use(cors());
 app.use(express.json());
-
+app.use(cookieParser());
 //routes
 app.use('/health', healthRouter);
 app.use('/auth', authRouter);

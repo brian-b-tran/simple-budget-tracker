@@ -1,6 +1,14 @@
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
-function generateAccessToken(userId: string, email: string): string {
+
+export interface RefreshTokenPayload {
+  sub: string;
+  sessionId: string;
+  email: string;
+  type: string;
+}
+
+export function generateAccessToken(userId: string, email: string): string {
   const payload = { sub: userId, email: email, type: 'access' };
   const token = jwt.sign(payload, env.JWT_ACCESS_SECRET, {
     expiresIn: '15m',
@@ -9,8 +17,17 @@ function generateAccessToken(userId: string, email: string): string {
   return token;
 }
 
-function generateRefreshToken(userId: string, sessionId: string): string {
-  const payload = { sub: userId, sessionId: sessionId, type: 'refresh' };
+export function generateRefreshToken(
+  userId: string,
+  sessionId: string,
+  email: string
+): string {
+  const payload = {
+    sub: userId,
+    sessionId: sessionId,
+    email: email,
+    type: 'refresh',
+  };
   const token = jwt.sign(payload, env.JWT_REFRESH_SECRET, {
     expiresIn: '7d',
   });
@@ -18,4 +35,7 @@ function generateRefreshToken(userId: string, sessionId: string): string {
   return token;
 }
 
-export { generateAccessToken, generateRefreshToken };
+export function verifyRefreshToken(token: string): RefreshTokenPayload {
+  const payload = jwt.verify(token, env.JWT_REFRESH_SECRET);
+  return payload as RefreshTokenPayload;
+}

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import {
   registerUserService,
   loginUserService,
+  refreshTokens,
 } from '../services/authServices';
 import z from 'zod';
 import { env } from '../config/env';
@@ -74,6 +75,33 @@ export async function loginUserController(
       } else {
         res.status(500).json({ message: 'Internal server error' });
       }
+    }
+  }
+}
+
+export async function refreshTokensController(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    res.status(401).json({ message: 'No refresh token provided' });
+    return;
+  }
+  try {
+    const [access, refresh] = await refreshTokens(refreshToken);
+    res.cookie('refreshToken', refresh, {
+      httpOnly: true,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+    });
+    res.status(200).json({ message: 'Tokens refreshed.', access: access });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Internal server error' });
     }
   }
 }
