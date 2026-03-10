@@ -8,7 +8,7 @@ import {
 } from '../utils/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import type { RefreshTokenPayload } from '../utils/jwt';
-
+import { defaultCategories } from '../constants/categories';
 export async function registerUserService(
   email: string,
   password: string
@@ -27,6 +27,14 @@ export async function registerUserService(
       email: email,
       passwordHash: passwordHash,
     },
+  });
+
+  await prisma.category.createMany({
+    data: defaultCategories.map((name: string) => ({
+      userId: newUser.id,
+      name: name,
+      isDefault: true,
+    })),
   });
 
   return newUser;
