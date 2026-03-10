@@ -14,13 +14,15 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
+  id           String     @id @default(uuid())
+  email        String     @unique
   passwordHash String
-  currency     String?   @default("CAD")
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  currency     String?    @default("CAD")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
   sessions     Session[]
+  categories   Category[]
+  expenses     Expense[]
 }
 
 model Session {
@@ -38,4 +40,34 @@ model Session {
   revokedAt        DateTime?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId    String
+  name      String
+  isDefault Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expenses  Expense[]
+}
+
+model Expense {
+  id                 String   @id @default(uuid())
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId             String
+  amountOriginal     Decimal
+  currencyOriginal   String
+  amountBase         Decimal?
+  exchangeRateUsed   Decimal?
+  categoryId         String
+  category           Category @relation(fields: [categoryId], references: [id])
+  budgetId           String?
+  recurringExpenseId String?
+  notes              String?
+  date               DateTime
+  time               DateTime
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
