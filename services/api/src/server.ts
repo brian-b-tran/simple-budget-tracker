@@ -6,6 +6,7 @@ import healthRouter from './routes/healthRoutes';
 import authRouter from './routes/authRoutes';
 
 import prisma from './config/db';
+import categoryRouter from './routes/categoryRoute';
 const app = express();
 
 //middleware
@@ -15,6 +16,7 @@ app.use(cookieParser());
 //routes
 app.use('/health', healthRouter);
 app.use('/auth', authRouter);
+app.use('/category', categoryRouter);
 app.use('/', async (req: Request, res: Response): Promise<void> => {
   res.json({ message: 'Expense API.' });
 });
