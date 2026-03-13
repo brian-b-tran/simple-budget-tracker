@@ -4,7 +4,9 @@ import { Expense } from '../../generated/prisma/client';
 import type {
   UpdateExpenseInput,
   CreateExpenseInput,
+  FilterExpenseInput,
 } from '../validators/expenseValidators';
+import { PaginatedExpenses } from '../types/expense';
 
 export async function getAllExpensesService(
   userId: string
@@ -121,4 +123,16 @@ export async function deleteExpenseService(
   });
 
   return expense;
+}
+
+export async function filterExpenseService(
+  userId: string,
+  filters: FilterExpenseInput
+): Promise<PaginatedExpenses> {
+  const filteredExpenses = await prisma.expense.findMany({
+    where: { userId: userId },
+    skip: (filters.page - 1) * filters.limit,
+    take: filters.limit,
+  });
+  return {};
 }
