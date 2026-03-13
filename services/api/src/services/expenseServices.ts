@@ -129,10 +129,39 @@ export async function filterExpenseService(
   userId: string,
   filters: FilterExpenseInput
 ): Promise<PaginatedExpenses> {
-  const filteredExpenses = await prisma.expense.findMany({
-    where: { userId: userId },
-    skip: (filters.page - 1) * filters.limit,
-    take: filters.limit,
-  });
-  return {};
+  const where = {
+    userId: userId,
+    ...(filters.categoryId && { categoryId: filters.categoryId }),
+    ...(filters.type && { type: filters.type }),
+    ...(filters.budgetId && { budgetId: filters.budgetId }),
+    ...(filters.startDate &&
+      filters.endDate && {
+        date: { gte: filters.startDate, lte: filters.endDate },
+      }),
+    ...(filters.minAmount &&
+      filters.maxAmount && {
+        amountOriginal: { gte: filters.minAmount, lte: filters.maxAmount },
+      }),
+  };
+
+  const [filteredExpenses, total] = await Promise.all([
+    prisma.expense.findMany({
+      where: where,
+      skip: (filters.page - 1) * filters.limit,
+      take: filters.limit,
+    }),
+    prisma.expense.count({
+      where: where,
+    }),
+  ]);
+
+  const pages: PaginatedExpenses = {
+    expenses: filteredExpenses,
+    limit: filters.limit,
+    total: total,
+    page: filters.page,
+    totalPages: Math.ceil(total / filters.limit),
+  };
+
+  return pages;
 }
