@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use('/health', healthRouter);
 app.use('/auth', authRouter);
 app.use('/category', categoryRouter);
-app.use('/expense', expenseRouter);
+app.use('/expenses', expenseRouter);
 
 app.use('/', async (req: Request, res: Response): Promise<void> => {
   res.json({ message: 'Expense API.' });
