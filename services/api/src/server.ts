@@ -2,11 +2,12 @@ import { env } from './config/env';
 import express, { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import prisma from './config/db';
 import healthRouter from './routes/healthRoutes';
 import authRouter from './routes/authRoutes';
 import expenseRouter from './routes/expenseRoutes';
-import prisma from './config/db';
 import categoryRouter from './routes/categoryRoute';
+import exchangeRouter from './routes/exchangeRateRoute';
 const app = express();
 
 //middleware
@@ -20,7 +21,7 @@ app.use('/health', healthRouter);
 app.use('/auth', authRouter);
 app.use('/category', categoryRouter);
 app.use('/expenses', expenseRouter);
-
+app.use('/exchange-rates', exchangeRouter);
 app.use('/', async (req: Request, res: Response): Promise<void> => {
   res.json({ message: 'Expense API.' });
 });

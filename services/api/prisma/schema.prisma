@@ -79,3 +79,13 @@ model Expense {
   updatedAt          DateTime    @updatedAt
   type               ExpenseType @default(EXPENSE)
 }
+
+model ExchangeRate {
+  id             String   @id @default(uuid())
+  baseCurrency   String
+  targetCurrency String
+  rate           Decimal
+  fetchedAt      DateTime @default(now())
+
+  @@index([baseCurrency, targetCurrency, fetchedAt])
+}
