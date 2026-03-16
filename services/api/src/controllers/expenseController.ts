@@ -129,7 +129,7 @@ export async function filterExpenseController(
       req.user!.userId,
       filter.data
     );
-    res.status(200).json({ filteredExpense });
+    res.status(200).json(filteredExpense);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
