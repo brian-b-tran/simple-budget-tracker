@@ -7,6 +7,7 @@ import type {
   FilterExpenseInput,
 } from '../validators/expenseValidators';
 import { PaginatedExpenses } from '../types/expense';
+import { getExchangeRateService } from './exchangeRateService';
 
 export async function getAllExpensesService(
   userId: string
@@ -47,6 +48,28 @@ export async function createExpenseService(
   if (!category) {
     throw new Error('Category not found.');
   }
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (!user) {
+    throw new Error('User not found. How did you get here?');
+  }
+  if (!user.currency) {
+    throw new Error('User has no base currency set.');
+  }
+  let amountBase;
+  let exchangeRateUsed;
+  if (user.currency === data.currencyOriginal) {
+    amountBase = data.amountOriginal;
+    exchangeRateUsed = 1;
+  } else {
+    const rate = await getExchangeRateService(
+      data.currencyOriginal,
+      user.currency!
+    );
+    exchangeRateUsed = rate.rate;
+    amountBase = exchangeRateUsed.mul(data.amountOriginal).toNumber();
+  }
+
   const newExpense = await prisma.expense.create({
     data: {
       userId: userId,
@@ -56,8 +79,8 @@ export async function createExpenseService(
       date: data.date,
       time: data.time,
       currencyOriginal: data.currencyOriginal,
-      amountBase: data.amountBase,
-      exchangeRateUsed: data.exchangeRateUsed,
+      amountBase: amountBase,
+      exchangeRateUsed: exchangeRateUsed,
       budgetId: data.budgetId,
       recurringExpenseId: data.recurringExpenseId,
       notes: data.notes,
