@@ -8,12 +8,73 @@ interface FrankfurterResponse {
 export async function getExchangeRateService(
   baseCurrency: string,
   targetCurrency: string
-): Promise<ExchangeRate> {}
+): Promise<ExchangeRate> {
+  const exchangeRate = await prisma.exchangeRate.findFirst({
+    where: { baseCurrency: baseCurrency, targetCurrency: targetCurrency },
+    orderBy: { fetchedAt: 'desc' },
+  });
+  const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
+  if (!exchangeRate || exchangeRate.fetchedAt.getTime() < twentyFourHoursAgo) {
+    const fetchedRates = await fetchAndStoreRates(baseCurrency, [
+      targetCurrency,
+    ]);
+    return fetchedRates[0];
+  } else {
+    return exchangeRate;
+  }
+}
 
 export async function getExchangeRatesService(
   baseCurrency: string,
-  targetCurrencies: string
-): Promise<Array<ExchangeRate>> {}
+  targetCurrencies: Array<string>
+): Promise<Array<ExchangeRate>> {
+  const exchangeRates = await prisma.exchangeRate.findMany({
+    where: {
+      baseCurrency: baseCurrency,
+      targetCurrency: { in: targetCurrencies },
+    },
+    orderBy: { fetchedAt: 'desc' },
+  });
+
+  //if some cached rates exist find any missing and fetch before returning
+  if (exchangeRates.length != 0) {
+    const cachedCurrencies = exchangeRates.map((rate) => rate.targetCurrency);
+    const missingCurrencies = targetCurrencies.filter(
+      (cached) => !cachedCurrencies.includes(cached)
+    );
+    const outDatedRates = [];
+    const returnRates = [];
+    const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
+    for (let i = 0; i < exchangeRates.length; i++) {
+      if (exchangeRates[i].fetchedAt.getTime() < twentyFourHoursAgo) {
+        outDatedRates.push(exchangeRates[i].targetCurrency);
+      } else {
+        returnRates.push(exchangeRates[i]);
+      }
+    }
+
+    const toFetch = [...outDatedRates, ...missingCurrencies];
+    if (toFetch.length > 0) {
+      const fetchedRates = await fetchAndStoreRates(baseCurrency, toFetch);
+      returnRates.push(...fetchedRates);
+    }
+
+    return returnRates;
+  }
+
+  //else no cached rates fetch new currencies and return
+  const fetchedRates = await fetchAndStoreRates(baseCurrency, targetCurrencies);
+  return fetchedRates;
+}
+
+export async function convertAmountService(
+  amount: number,
+  baseCurrency: string,
+  targetCurrency: string
+): Promise<number> {
+  const rate = await getExchangeRateService(baseCurrency, targetCurrency);
+  return rate.rate.mul(amount).toNumber();
+}
 
 async function fetchAndStoreRates(
   baseCurrency: string,
@@ -51,9 +112,3 @@ async function fetchAndStoreRates(
   }
   return [];
 }
-
-function convertAmount(
-  amount: number,
-  baseCurrency: number,
-  targetCurrency
-): number {}
