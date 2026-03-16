@@ -24,7 +24,7 @@ export async function getExchangeRateService(
   }
 }
 
-export async function getExchangeRatesService(
+export async function getMultiExchangeRatesService(
   baseCurrency: string,
   targetCurrencies: Array<string>
 ): Promise<Array<ExchangeRate>> {
