@@ -4,7 +4,7 @@ import {
   CreateBudgetInput,
   UpdateBudgetInput,
 } from '../validators/budgetValidators';
-import type { BudgetSummary } from '../types/budget';
+import type { BudgetSummary, BudgetCategoryBreakdown } from '../types/budget';
 
 export async function getBudgetService(
   userId: string,
@@ -16,22 +16,64 @@ export async function getBudgetService(
   if (!budget) {
     throw new Error('Could not find this budget.');
   }
-  const expenseSumAggregate = await prisma.expense.aggregate({
-    where: { userId: userId, budgetId: budget.id },
-    _sum: { amountBase: true },
-  });
 
+  const [expenseSumAggregate, CategoryGroups] = await Promise.all([
+    //total spent for all expenses
+    prisma.expense.aggregate({
+      where: { userId: userId, budgetId: budget.id },
+      _sum: { amountBase: true },
+    }),
+    //total spent grouped by category
+    prisma.expense.groupBy({
+      by: ['categoryId'],
+      where: { budgetId: budgetId, userId: userId },
+      _sum: { amountBase: true },
+    }),
+  ]);
+  //total spent, remaining and percentage for all expenses
   const totalSpent =
     expenseSumAggregate._sum.amountBase ?? new Prisma.Decimal(0);
-
   const remaining = budget.totalAmount.sub(totalSpent);
   const percentage = totalSpent.div(budget.totalAmount).times(100);
+
+  //find the categories to create BudgetCategoryBreakdowns
+  const categoryIds = CategoryGroups.map((group) => group.categoryId);
+  const categories = await prisma.category.findMany({
+    where: { id: { in: categoryIds } },
+  });
+
+  //combine group by category amounts spent with categories to create BudgetCategoryBreakdowns
+  const categoryBreakdownArray = CategoryGroups.map(
+    (group): BudgetCategoryBreakdown => {
+      //match category ids to find category name
+      const category = categories.find(
+        (category) => category.id === group.categoryId
+      );
+      if (!category) {
+        throw new Error('Something Crazy went wrong internally.');
+      }
+      //total, remaining and percentage for each category
+      const totalGroupAmount = group._sum.amountBase ?? new Prisma.Decimal(0);
+      const groupPercentage = totalGroupAmount
+        .div(budget.totalAmount)
+        .times(100);
+
+      //categoryBreakdown object
+      return {
+        categoryId: category.id,
+        categoryName: category.name,
+        spent: totalGroupAmount.toNumber(),
+        percentageOfTotal: groupPercentage.toNumber(),
+      };
+    }
+  );
 
   return {
     budget: budget,
     totalSpent: totalSpent.toNumber(),
     remaining: remaining.toNumber(),
     percentageUsed: percentage.toNumber(),
+    categoryBreakdown: categoryBreakdownArray,
   };
 }
 
