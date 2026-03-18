@@ -9,6 +9,7 @@ import expenseRouter from './routes/expenseRoutes';
 import categoryRouter from './routes/categoryRoute';
 import exchangeRouter from './routes/exchangeRateRoute';
 import budgetRouter from './routes/budgetRoutes';
+import recurringRouter from './routes/recurringExpenseRoutes';
 const app = express();
 
 //middleware
@@ -24,6 +25,7 @@ app.use('/category', categoryRouter);
 app.use('/expenses', expenseRouter);
 app.use('/exchange-rates', exchangeRouter);
 app.use('/budgets', budgetRouter);
+app.use('/recurring-expenses', recurringRouter);
 app.use('/', async (req: Request, res: Response): Promise<void> => {
   res.json({ message: 'Expense API.' });
 });
