@@ -10,6 +10,7 @@ import categoryRouter from './routes/categoryRoute';
 import exchangeRouter from './routes/exchangeRateRoute';
 import budgetRouter from './routes/budgetRoutes';
 import recurringRouter from './routes/recurringExpenseRoutes';
+import { recurringExpenseScheduler } from './workers/scheduler';
 const app = express();
 
 //middleware
@@ -21,7 +22,7 @@ app.use(cookieParser());
 
 app.use('/health', healthRouter);
 app.use('/auth', authRouter);
-app.use('/category', categoryRouter);
+app.use('/categories', categoryRouter);
 app.use('/expenses', expenseRouter);
 app.use('/exchange-rates', exchangeRouter);
 app.use('/budgets', budgetRouter);
@@ -34,6 +35,7 @@ const startServer = async (): Promise<void> => {
   try {
     await prisma.$connect();
     console.log('Database connected successfully');
+    recurringExpenseScheduler.start();
     app.listen(env.PORT, () => {
       console.log(`API running on port ${env.PORT} in ${env.NODE_ENV} mode`);
     });

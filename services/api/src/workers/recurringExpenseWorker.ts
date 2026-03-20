@@ -1,7 +1,6 @@
 import { RecurringExpense } from '../../generated/prisma/client';
 import { addDays, addMonths, addYears } from 'date-fns';
 import prisma from '../config/db';
-import { createExpenseService } from '../services/expenseServices';
 import { getExchangeRateService } from '../services/exchangeRateService';
 
 function calculateNextRunDate(recurringExpense: RecurringExpense): Date {
