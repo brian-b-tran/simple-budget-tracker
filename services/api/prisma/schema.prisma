@@ -126,9 +126,7 @@ model Budget {
 enum Frequency {
   DAILY
   WEEKLY
-  BIWEEKLY
   MONTHLY
-  QUARTERLY
   YEARLY
 }
 
