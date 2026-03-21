@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import prisma from './config/db';
+import logger from './utils/logger';
 import healthRouter from './routes/healthRoutes';
 import authRouter from './routes/authRoutes';
 import expenseRouter from './routes/expenseRoutes';
@@ -34,13 +35,13 @@ app.use('/', async (req: Request, res: Response): Promise<void> => {
 const startServer = async (): Promise<void> => {
   try {
     await prisma.$connect();
-    console.log('Database connected successfully');
+    logger.info('Database connected successfully');
     recurringExpenseScheduler.start();
     app.listen(env.PORT, () => {
-      console.log(`API running on port ${env.PORT} in ${env.NODE_ENV} mode`);
+      logger.info(`API running on port ${env.PORT} in ${env.NODE_ENV} mode`);
     });
   } catch (error) {
-    console.error('Database connection failed:', error);
+    logger.error('Database connection failed:', error);
     process.exit(1);
   }
 };
