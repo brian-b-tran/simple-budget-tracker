@@ -25,6 +25,7 @@ model User {
   expenses          Expense[]
   budgets           Budget[]
   recurringExpenses RecurringExpense[]
+  reminders         Reminder[]
 }
 
 model Session {
@@ -150,4 +151,18 @@ model RecurringExpense {
   updatedAt        DateTime    @updatedAt
   type             ExpenseType @default(EXPENSE)
   expenses         Expense[]
+}
+
+model Reminder {
+  id                  String     @id @default(uuid())
+  userId              String
+  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  title               String
+  dateTime            DateTime
+  recurring           Boolean    @default(false)
+  recurrenceFrequency Frequency?
+  notes               String?
+  interval            Int        @default(1)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
 }

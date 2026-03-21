@@ -24,6 +24,16 @@ services:
       - ../services/api/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+  shadow_db:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: expense_tracker_shadow
+    volumes:
+      - shadow_postgres_data:/var/lib/postgresql/data
 volumes:
   postgres_data:
+  shadow_postgres_data:

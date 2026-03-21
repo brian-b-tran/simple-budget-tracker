@@ -6,14 +6,7 @@ export const createRecurringExpenseSchema = z.object({
     .refine((val) => val !== 0, { message: 'Amount cannot be zero' }),
   currencyOriginal: z.string().length(3).optional(),
   categoryId: z.uuid(),
-  frequency: z.enum([
-    'DAILY',
-    'WEEKLY',
-    'BIWEEKLY',
-    'MONTHLY',
-    'QUARTERLY',
-    'YEARLY',
-  ]),
+  frequency: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']),
   interval: z.int().positive().default(1),
   startDate: z.coerce.date(),
   endDate: z.coerce.date().optional(),
@@ -29,9 +22,7 @@ export const updateRecurringExpenseSchema = z.object({
     .optional(),
   currencyOriginal: z.string().length(3).optional(),
   categoryId: z.uuid().optional(),
-  frequency: z
-    .enum(['DAILY', 'WEEKLY', 'BIWEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY'])
-    .optional(),
+  frequency: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']).optional(),
   interval: z.int().positive().default(1).optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
