@@ -14,16 +14,17 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(uuid())
-  email        String     @unique
-  passwordHash String
-  currency     String?    @default("CAD")
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  sessions     Session[]
-  categories   Category[]
-  expenses     Expense[]
-  budgets      Budget[]
+  id                String             @id @default(uuid())
+  email             String             @unique
+  passwordHash      String
+  currency          String?            @default("CAD")
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  sessions          Session[]
+  categories        Category[]
+  expenses          Expense[]
+  budgets           Budget[]
+  recurringExpenses RecurringExpense[]
 }
 
 model Session {
@@ -44,14 +45,15 @@ model Session {
 }
 
 model Category {
-  id        String    @id @default(uuid())
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId    String
-  name      String
-  isDefault Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  expenses  Expense[]
+  id                String             @id @default(uuid())
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId            String
+  name              String
+  isDefault         Boolean            @default(false)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  expenses          Expense[]
+  recurringExpenses RecurringExpense[]
 
   @@unique([userId, name])
 }
@@ -62,24 +64,25 @@ enum ExpenseType {
 }
 
 model Expense {
-  id                 String      @id @default(uuid())
-  user               User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id                 String            @id @default(uuid())
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId             String
   amountOriginal     Decimal
   currencyOriginal   String
   amountBase         Decimal?
   exchangeRateUsed   Decimal?
   categoryId         String
-  category           Category    @relation(fields: [categoryId], references: [id])
+  category           Category          @relation(fields: [categoryId], references: [id])
   budgetId           String?
-  budget             Budget?     @relation(fields: [budgetId], references: [id])
+  budget             Budget?           @relation(fields: [budgetId], references: [id])
   recurringExpenseId String?
+  recurringExpense   RecurringExpense? @relation(fields: [recurringExpenseId], references: [id])
   notes              String?
   date               DateTime
   time               DateTime
-  createdAt          DateTime    @default(now())
-  updatedAt          DateTime    @updatedAt
-  type               ExpenseType @default(EXPENSE)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  type               ExpenseType       @default(EXPENSE)
 }
 
 model ExchangeRate {
@@ -116,5 +119,35 @@ model Budget {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  expenses Expense[]
+  expenses          Expense[]
+  recurringExpenses RecurringExpense[]
+}
+
+enum Frequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+model RecurringExpense {
+  id               String      @id @default(uuid())
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId           String
+  amountOriginal   Decimal
+  currencyOriginal String
+  categoryId       String
+  category         Category    @relation(fields: [categoryId], references: [id])
+  frequency        Frequency
+  interval         Int         @default(1)
+  startDate        DateTime
+  endDate          DateTime?
+  nextRunDate      DateTime
+  budgetId         String?
+  budget           Budget?     @relation(fields: [budgetId], references: [id])
+  notes            String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  type             ExpenseType @default(EXPENSE)
+  expenses         Expense[]
 }

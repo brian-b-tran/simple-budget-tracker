@@ -76,7 +76,7 @@ export async function convertAmountService(
   return rate.rate.mul(amount).toNumber();
 }
 
-async function fetchAndStoreRates(
+export async function fetchAndStoreRates(
   baseCurrency: string,
   targetCurrencies: Array<string>
 ): Promise<Array<ExchangeRate>> {

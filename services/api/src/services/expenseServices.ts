@@ -32,7 +32,7 @@ export async function getExpenseService(
     },
   });
   if (!expense) {
-    throw new Error('Error: could not find this expense.');
+    throw new Error('Could not find this expense.');
   }
   return expense;
 }
