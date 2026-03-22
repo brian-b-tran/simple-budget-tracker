@@ -10,6 +10,7 @@ import expenseRouter from './routes/expenseRoutes';
 import categoryRouter from './routes/categoryRoute';
 import exchangeRouter from './routes/exchangeRateRoute';
 import budgetRouter from './routes/budgetRoutes';
+import reminderRouter from './routes/reminderRoutes';
 import recurringRouter from './routes/recurringExpenseRoutes';
 import { recurringExpenseScheduler } from './workers/scheduler';
 const app = express();
@@ -28,6 +29,7 @@ app.use('/expenses', expenseRouter);
 app.use('/exchange-rates', exchangeRouter);
 app.use('/budgets', budgetRouter);
 app.use('/recurring-expenses', recurringRouter);
+app.use('/reminders', reminderRouter);
 app.use('/', async (req: Request, res: Response): Promise<void> => {
   res.json({ message: 'Expense API.' });
 });
