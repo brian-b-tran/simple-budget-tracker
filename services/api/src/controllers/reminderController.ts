@@ -10,7 +10,7 @@ import {
   updateReminderService,
   deleteReminderService,
   getUpcomingRemindersService,
-} from '../services/reminderServices';
+} from '../services/reminderService';
 
 export async function getReminderController(
   req: Request,
