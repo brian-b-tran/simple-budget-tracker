@@ -21,23 +21,11 @@ function calculateNextRunDate(recurringExpense: RecurringExpense): Date {
         7 * recurringExpense.interval
       );
       break;
-    case 'BIWEEKLY':
-      newRunDate = addDays(
-        recurringExpense.nextRunDate,
-        14 * recurringExpense.interval
-      );
-      break;
 
     case 'MONTHLY':
       newRunDate = addMonths(
         recurringExpense.nextRunDate,
         recurringExpense.interval
-      );
-      break;
-    case 'QUARTERLY':
-      newRunDate = addMonths(
-        recurringExpense.nextRunDate,
-        3 * recurringExpense.interval
       );
       break;
     case 'YEARLY':

@@ -5,11 +5,11 @@ import {
   refreshTokensService,
   logoutUserService,
   logoutAllUserService,
-} from '../services/authServices';
+} from '../services/authService';
 import {
   userRegisterSchema,
   userLoginSchema,
-} from '../validators/authValidators';
+} from '../validators/authValidator';
 import { env } from '../config/env';
 
 export async function registerUserController(

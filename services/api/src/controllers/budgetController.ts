@@ -5,11 +5,11 @@ import {
   createBudgetService,
   updateBudgetService,
   deleteBudgetService,
-} from '../services/budgetServices';
+} from '../services/budgetService';
 import {
   createBudgetSchema,
   updateBudgetSchema,
-} from '../validators/budgetValidators';
+} from '../validators/budgetValidator';
 
 export async function getBudgetController(
   req: Request,

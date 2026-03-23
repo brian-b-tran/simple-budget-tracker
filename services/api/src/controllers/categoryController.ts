@@ -4,7 +4,7 @@ import {
   createCategoryService,
   updateCategoryService,
   deleteCategoryService,
-} from '../services/categoryServices';
+} from '../services/categoryService';
 
 export async function getAllCategoryController(
   req: Request,

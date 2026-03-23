@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { filterExpenseSchema } from '../validators/expenseValidators';
+import { filterExpenseSchema } from '../validators/expenseValidator';
 import {
   getAllExpensesService,
   getExpenseService,
@@ -7,11 +7,11 @@ import {
   updateExpenseService,
   deleteExpenseService,
   filterExpenseService,
-} from '../services/expenseServices';
+} from '../services/expenseService';
 import {
   createExpenseValidationSchema,
   updateExpenseValidationSchema,
-} from '../validators/expenseValidators';
+} from '../validators/expenseValidator';
 
 export async function getAllExpensesController(
   req: Request,
