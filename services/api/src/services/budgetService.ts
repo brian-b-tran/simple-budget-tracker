@@ -88,6 +88,27 @@ export async function createBudgetService(
   userId: string,
   budgetData: CreateBudgetInput
 ): Promise<Budget> {
+  if (
+    budgetData.type === 'VACATION' &&
+    budgetData.startDate &&
+    budgetData.endDate
+  ) {
+    const overlappingBudget = await prisma.budget.findFirst({
+      where: {
+        userId: userId,
+        type: 'VACATION',
+        AND: [
+          { startDate: { lt: budgetData.endDate } },
+          { endDate: { gt: budgetData.startDate } },
+        ],
+      },
+    });
+
+    if (overlappingBudget) {
+      throw new Error('This Vacation Budget overlaps with another.');
+    }
+  }
+
   const newBudget = await prisma.budget.create({
     data: {
       userId: userId,
@@ -114,10 +135,32 @@ export async function updateBudgetService(
   const oldBudget = await prisma.budget.findUnique({
     where: { id: budgetId, userId: userId },
   });
-
   if (!oldBudget) {
     throw new Error('Could not find this Budget.');
   }
+
+  if (
+    budgetData.type === 'VACATION' &&
+    budgetData.startDate &&
+    budgetData.endDate
+  ) {
+    const overlappingBudget = await prisma.budget.findFirst({
+      where: {
+        userId: userId,
+        type: 'VACATION',
+        id: { not: budgetId },
+        AND: [
+          { startDate: { lt: budgetData.endDate } },
+          { endDate: { gt: budgetData.startDate } },
+        ],
+      },
+    });
+
+    if (overlappingBudget) {
+      throw new Error('This Vacation Budget overlaps with another.');
+    }
+  }
+
   const updatedBudget = await prisma.budget.update({
     where: { id: budgetId, userId: userId },
     data: {
