@@ -5,7 +5,7 @@ import type {
   UpdateExpenseInput,
   CreateExpenseInput,
   FilterExpenseInput,
-} from '../validators/expenseValidators';
+} from '../validators/expenseValidator';
 import { PaginatedExpenses } from '../types/expense';
 import { getExchangeRateService } from './exchangeRateService';
 

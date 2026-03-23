@@ -3,7 +3,7 @@ import { Budget, Prisma } from '../../generated/prisma/client';
 import {
   CreateBudgetInput,
   UpdateBudgetInput,
-} from '../validators/budgetValidators';
+} from '../validators/budgetValidator';
 import type { BudgetSummary, BudgetCategoryBreakdown } from '../types/budget';
 
 export async function getBudgetService(
