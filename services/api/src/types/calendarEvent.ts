@@ -8,7 +8,3 @@ export type CalendarEvent = {
   endDate: Date | null;
   metadata: Record<string, unknown>;
 };
-
-export type CalendarFeed = {
-  events: CalendarEvent[];
-};
