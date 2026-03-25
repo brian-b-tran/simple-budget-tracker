@@ -40,3 +40,17 @@ export async function registerService(registerCredentials: {
     throw new Error(errorMessage);
   }
 }
+
+export async function refreshAccessService(token: string) {
+  try {
+    const response: AxiosResponse<LoginResponse> = await api.post(
+      '/auth/refresh',
+      { token: token },
+      { withCredentials: true }
+    );
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message || 'An unexpected error occurred';
+    throw new Error(errorMessage);
+  }
+}
