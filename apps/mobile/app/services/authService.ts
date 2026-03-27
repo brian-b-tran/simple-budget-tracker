@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import api from './api';
 interface LoginResponse {
-  token: string;
+  access: string;
 }
 
 export async function loginService(loginCredentials: {
@@ -29,11 +29,7 @@ export async function registerService(registerCredentials: {
   password: string;
 }): Promise<void> {
   try {
-    const response: AxiosResponse<LoginResponse> = await api.post(
-      '/auth/login',
-      { ...registerCredentials },
-      { withCredentials: true }
-    );
+    await api.post('/auth/register', { ...registerCredentials });
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || 'An unexpected error occurred';
@@ -41,13 +37,14 @@ export async function registerService(registerCredentials: {
   }
 }
 
-export async function refreshAccessService(token: string) {
+export async function refreshAccessService(): Promise<LoginResponse> {
   try {
     const response: AxiosResponse<LoginResponse> = await api.post(
       '/auth/refresh',
-      { token: token },
+      {},
       { withCredentials: true }
     );
+    return { access: response.data.access };
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || 'An unexpected error occurred';
