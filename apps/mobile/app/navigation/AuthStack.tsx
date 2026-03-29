@@ -5,16 +5,17 @@ import RegisterScreen from '../screens/auth/RegisterScreen';
 
 const Stack = createNativeStackNavigator();
 interface AuthStackProps {
-  onLogin: () => void;
+  onLogin: (email: string, password: string) => void;
+  onRegister: (email: string, password: string) => void;
 }
-function AuthStack({ onLogin }: AuthStackProps) {
+function AuthStack({ onLogin, onRegister }: AuthStackProps) {
   return (
     <Stack.Navigator>
       <Stack.Screen name='LoginScreen'>
         {() => <LoginScreen onLogin={onLogin} />}
       </Stack.Screen>
       <Stack.Screen name='RegisterScreen'>
-        {() => <RegisterScreen onLogin={onLogin} />}
+        {() => <RegisterScreen onRegister={onRegister} />}
       </Stack.Screen>
     </Stack.Navigator>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 interface LoginScreenProps {
-  onLogin: () => void;
+  onLogin: (email: string, password: string) => void;
 }
 function LoginScreen({ onLogin }: LoginScreenProps) {
   return (

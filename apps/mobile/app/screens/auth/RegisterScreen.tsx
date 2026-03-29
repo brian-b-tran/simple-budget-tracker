@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 interface RegisterScreenProps {
-  onLogin: () => void;
+  onRegister: (email: string, password: string) => void;
 }
-function RegisterScreen({ onLogin }: RegisterScreenProps) {
+function RegisterScreen({ onRegister }: RegisterScreenProps) {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Login Screen</Text>
