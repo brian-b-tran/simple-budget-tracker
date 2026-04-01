@@ -3,19 +3,25 @@ import React from 'react';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 
+export type AuthStackParamList = {
+  LoginScreen: undefined;
+  RegisterScreen: undefined;
+};
+
 const Stack = createNativeStackNavigator();
 interface AuthStackProps {
-  onLogin: (email: string, password: string) => void;
+  onLogin: (data: { email: string; password: string }) => void;
   onRegister: (email: string, password: string) => void;
 }
+
 function AuthStack({ onLogin, onRegister }: AuthStackProps) {
   return (
     <Stack.Navigator>
       <Stack.Screen name='LoginScreen'>
-        {() => <LoginScreen onLogin={onLogin} />}
+        {(props) => <LoginScreen {...props} onLogin={onLogin} />}
       </Stack.Screen>
       <Stack.Screen name='RegisterScreen'>
-        {() => <RegisterScreen onRegister={onRegister} />}
+        {(props) => <RegisterScreen {...props} onRegister={onRegister} />}
       </Stack.Screen>
     </Stack.Navigator>
   );
