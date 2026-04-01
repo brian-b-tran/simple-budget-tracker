@@ -63,10 +63,10 @@ function LoginScreen({ onLogin }: LoginScreenProps) {
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
                   className={`bg-white border p-4 rounded-xl text-slate-900 ${errors.email ? 'border-red-500' : 'border-slate-200'}`}
-                  placeholder='email@example.com'
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
+                  placeholder='email@example.com'
                   autoCapitalize='none'
                   autoFocus={false}
                   keyboardType='email-address'
@@ -123,7 +123,7 @@ function LoginScreen({ onLogin }: LoginScreenProps) {
           </TouchableOpacity>
           <TouchableOpacity
             className='mt-6'
-            onPress={() => navigation.navigate('RegisterScreen')}
+            onPress={() => navigation.navigate('Register')}
           >
             <Text className='text-slate-400 font-bold text-center'>
               Don't have an account? Register
