@@ -12,7 +12,7 @@ interface AuthContextType {
   accessToken: string | null;
   isLoading: boolean;
   register: (email: string, password: string) => void;
-  login: (data: { email: string; password: string }) => void;
+  login: (email: string, password: string) => void;
   logout: () => void;
   refresh: () => void;
 }
@@ -23,8 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const login = async (data: { email: string; password: string }) => {
-    const { email, password } = data;
+  const login = async (email: string, password: string) => {
     try {
       const token = await loginService(email, password);
       await SecureStore.setItemAsync('accessToken', token.access);

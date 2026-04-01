@@ -24,7 +24,7 @@ const loginFormSchema = z.object({
 type loginFormData = z.infer<typeof loginFormSchema>;
 
 interface LoginScreenProps {
-  onLogin: (data: loginFormData) => void;
+  onLogin: (email: string, password: string) => void;
 }
 function LoginScreen({ onLogin }: LoginScreenProps) {
   //email, password, error, isSubmitting
@@ -40,7 +40,7 @@ function LoginScreen({ onLogin }: LoginScreenProps) {
   });
 
   const onSubmit = (data: loginFormData) => {
-    onLogin(data);
+    onLogin(data.email, data.password);
   };
 
   return (
