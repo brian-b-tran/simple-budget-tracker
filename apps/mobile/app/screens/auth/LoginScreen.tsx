@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   View,
@@ -28,6 +28,7 @@ interface LoginScreenProps {
 }
 function LoginScreen({ onLogin }: LoginScreenProps) {
   //email, password, error, isSubmitting
+  const [apiError, setApiError] = useState<boolean>(false);
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const {
@@ -39,8 +40,15 @@ function LoginScreen({ onLogin }: LoginScreenProps) {
     defaultValues: { email: '', password: '' },
   });
 
-  const onSubmit = (data: loginFormData) => {
-    onLogin(data.email, data.password);
+  const onSubmit = async (data: loginFormData) => {
+    setApiError(false);
+    try {
+      await onLogin(data.email, data.password);
+    } catch (error: any) {
+      setApiError(true);
+      console.error('Failed to login.', error);
+      return;
+    }
   };
 
   return (
@@ -121,6 +129,11 @@ function LoginScreen({ onLogin }: LoginScreenProps) {
               <Text className='text-white font-bold text-lg'>Login</Text>
             )}
           </TouchableOpacity>
+          {apiError && (
+            <Text className='pl-2 text-red-300 font-small'>
+              Something went wrong in the backend please try again later.
+            </Text>
+          )}
           <TouchableOpacity
             className='mt-6'
             onPress={() => navigation.navigate('Register')}

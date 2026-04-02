@@ -7,6 +7,7 @@ import {
   refreshAccessService,
   registerService,
 } from '../services/authService';
+import { boolean } from 'zod';
 
 interface AuthContextType {
   accessToken: string | null;
@@ -25,18 +26,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('trying to log in.');
       const token = await loginService(email, password);
       await SecureStore.setItemAsync('accessToken', token.access);
       setAccessToken(token.access);
     } catch (error) {
-      console.error('Failed to login.', error);
+      //console.error('Failed to login.', error);
+      throw error;
     }
   };
   const register = async (email: string, password: string) => {
     try {
       await registerService(email, password);
     } catch (error) {
-      console.error('Failed to register.', error);
+      //console.error('Failed to register.', error);
+      throw error;
     }
   };
 

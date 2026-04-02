@@ -21,11 +21,8 @@ export async function registerUserController(
     res.status(400).json({ Error: result.error });
   } else {
     try {
-      const newUser = await registerUserService(
-        result.data.email,
-        result.data.password
-      );
-      res.status(201).json({ message: 'registered.', user: newUser });
+      await registerUserService(result.data.email, result.data.password);
+      res.status(201).json({ message: 'registered.' });
     } catch (error) {
       if (error instanceof Error) {
         res.status(400).json({ message: error.message });

@@ -8,7 +8,7 @@ export type AuthStackParamList = {
   Register: undefined;
 };
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<AuthStackParamList>();
 interface AuthStackProps {
   onLogin: (email: string, password: string) => void;
   onRegister: (email: string, password: string) => void;

@@ -9,6 +9,7 @@ export async function loginService(
   password: string
 ): Promise<accessToken> {
   try {
+    console.log('hitting login endpoint');
     const response: AxiosResponse<accessToken> = await api.post(
       '/auth/login',
       { email: email, password: password },
@@ -27,7 +28,12 @@ export async function registerService(
   password: string
 ): Promise<void> {
   try {
-    await api.post('/auth/register', { email: email, password: password });
+    console.log('hitting register endpoint');
+    await api.post(
+      '/auth/register',
+      { email: email, password: password },
+      { withCredentials: true }
+    );
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || 'An unexpected error occurred';

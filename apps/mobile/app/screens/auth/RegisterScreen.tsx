@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   View,
@@ -48,8 +48,10 @@ const RegisterInputSchema = z
 type RegisterFormData = z.infer<typeof RegisterInputSchema>;
 
 function RegisterScreen({ onRegister }: RegisterScreenProps) {
+  const [apiError, setApiError] = useState<boolean>(false);
   const navigate =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+
   const {
     control,
     handleSubmit,
@@ -59,8 +61,16 @@ function RegisterScreen({ onRegister }: RegisterScreenProps) {
     defaultValues: { email: '', password: '', confirmPassword: '' },
   });
 
-  const onSubmit = (data: RegisterFormData) => {
-    onRegister(data.email, data.password);
+  const onSubmit = async (data: RegisterFormData) => {
+    setApiError(false);
+    try {
+      console.log('trying to register.');
+      await onRegister(data.email, data.password);
+    } catch (error: any) {
+      setApiError(true);
+      console.error('Failed to register.', error);
+      return;
+    }
   };
 
   return (
@@ -173,6 +183,11 @@ function RegisterScreen({ onRegister }: RegisterScreenProps) {
               <Text className='text-white font-bold text-lg'>Register</Text>
             )}
           </TouchableOpacity>
+          {apiError && (
+            <Text className='pl-2 text-red-300 font-small'>
+              Something went wrong in the backend please try again later.
+            </Text>
+          )}
           {/*Navigate to login */}
           <TouchableOpacity
             className='mt-6'

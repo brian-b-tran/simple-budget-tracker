@@ -41,7 +41,7 @@ const startServer = async (): Promise<void> => {
     await prisma.$connect();
     logger.info('Database connected successfully');
     recurringExpenseScheduler.start();
-    app.listen(env.PORT, () => {
+    app.listen(env.PORT, '0.0.0.0', () => {
       logger.info(`API running on port ${env.PORT} in ${env.NODE_ENV} mode`);
     });
   } catch (error) {
