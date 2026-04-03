@@ -1,9 +1,9 @@
 import prisma from '../config/db';
 import { Budget, Prisma } from '../../generated/prisma/client';
 import {
-  CreateBudgetInput,
-  UpdateBudgetInput,
-} from '../validators/budgetValidator';
+  CreateBudgetBackendInput,
+  UpdateBudgetBackendInput,
+} from '@expense-app/types';
 import type { BudgetSummary, BudgetCategoryBreakdown } from '../types/budget';
 
 export async function getBudgetService(
@@ -86,7 +86,7 @@ export async function getAllBudgetsService(
 
 export async function createBudgetService(
   userId: string,
-  budgetData: CreateBudgetInput
+  budgetData: CreateBudgetBackendInput
 ): Promise<Budget> {
   if (
     budgetData.type === 'VACATION' &&
@@ -130,7 +130,7 @@ export async function createBudgetService(
 export async function updateBudgetService(
   userId: string,
   budgetId: string,
-  budgetData: UpdateBudgetInput
+  budgetData: UpdateBudgetBackendInput
 ): Promise<Budget> {
   const oldBudget = await prisma.budget.findUnique({
     where: { id: budgetId, userId: userId },

@@ -1,9 +1,9 @@
 import prisma from '../config/db';
 import { RecurringExpense } from '../../generated/prisma/client';
 import type {
-  CreateRecurringInput,
-  UpdateRecurringInput,
-} from '../validators/recurringExpenseValidator';
+  CreateRecurringExpenseBackendInput,
+  UpdateRecurringExpenseBackendInput,
+} from '@expense-app/types';
 
 export async function getRecurringExpenseService(
   userId: string,
@@ -32,7 +32,7 @@ export async function getAllRecurringExpenseService(
 
 export async function createRecurringExpenseService(
   userId: string,
-  data: CreateRecurringInput
+  data: CreateRecurringExpenseBackendInput
 ): Promise<RecurringExpense> {
   const category = await prisma.category.findUnique({
     where: { id: data.categoryId, userId: userId },
@@ -74,7 +74,7 @@ export async function createRecurringExpenseService(
 export async function updateRecurringExpenseService(
   userId: string,
   recurringId: string,
-  data: UpdateRecurringInput
+  data: UpdateRecurringExpenseBackendInput
 ): Promise<RecurringExpense> {
   const oldRecurringExpense = await prisma.recurringExpense.findUnique({
     where: { id: recurringId, userId: userId },

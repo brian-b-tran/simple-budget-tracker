@@ -2,10 +2,10 @@ import prisma from '../config/db';
 import { Expense } from '../../generated/prisma/client';
 
 import type {
-  UpdateExpenseInput,
-  CreateExpenseInput,
+  UpdateExpenseBackendInput,
+  CreateExpenseBackendInput,
   FilterExpenseInput,
-} from '../validators/expenseValidator';
+} from '@expense-app/types';
 import { PaginatedExpenses } from '../types/expense';
 import { getExchangeRateService } from './exchangeRateService';
 
@@ -39,7 +39,7 @@ export async function getExpenseService(
 
 export async function createExpenseService(
   userId: string,
-  data: CreateExpenseInput
+  data: CreateExpenseBackendInput
 ): Promise<Expense> {
   const category = await prisma.category.findUnique({
     where: { id: data.categoryId, userId: userId },
@@ -93,7 +93,7 @@ export async function createExpenseService(
 export async function updateExpenseService(
   userId: string,
   expenseId: string,
-  data: UpdateExpenseInput
+  data: UpdateExpenseBackendInput
 ): Promise<Expense> {
   if (data.categoryId) {
     const category = await prisma.category.findUnique({
