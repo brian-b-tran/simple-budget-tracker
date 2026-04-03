@@ -7,7 +7,7 @@ import {
   refreshAccessService,
   registerService,
 } from '../services/authService';
-import { boolean } from 'zod';
+import { setupInterceptors } from '../services/api';
 
 interface AuthContextType {
   accessToken: string | null;
@@ -56,26 +56,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await SecureStore.setItemAsync('accessToken', newToken.access);
       setAccessToken(newToken.access);
     } catch (error) {
-      console.error('Failed to refresh.', error);
+      throw error;
     }
   };
 
+  //useEffect on startup
   useEffect(() => {
     const loadToken = async () => {
       setIsLoading(true);
       try {
         const token = await SecureStore.getItemAsync('accessToken');
         if (token) {
-          setAccessToken(token);
+          await refresh();
         }
       } catch (error) {
         console.error('Failed to load token from SecureStore', error);
+        await logout();
       } finally {
         setIsLoading(false);
       }
     };
     loadToken();
   }, []);
+
+  useEffect(() => {
+    setupInterceptors(() => accessToken, refresh, logout);
+  }, [accessToken]);
 
   return (
     <AuthContext.Provider

@@ -66,6 +66,7 @@ function RegisterScreen({ onRegister }: RegisterScreenProps) {
     try {
       console.log('trying to register.');
       await onRegister(data.email, data.password);
+      navigate.navigate('Login');
     } catch (error: any) {
       setApiError(true);
       console.error('Failed to register.', error);
