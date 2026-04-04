@@ -4,7 +4,7 @@ export const expenseBaseSchema = z.object({
   amountOriginal: z
     .number()
     .refine((val) => val !== 0, { message: 'Amount cannot be zero' }),
-  categoryId: z.string().min(1),
+  categoryId: z.uuid().min(1),
   date: z.coerce.date(),
   time: z.coerce.date(),
   type: z.enum(['EXPENSE', 'INCOME']).default('EXPENSE'),

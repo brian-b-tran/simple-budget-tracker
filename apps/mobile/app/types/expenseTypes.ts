@@ -11,20 +11,9 @@ export interface Expense {
   budgetId?: string;
   recurringExpenseId?: string;
   notes?: string;
-  date: Date;
-  time: Date;
+  date: string;
+  time: string;
   type: 'EXPENSE' | 'INCOME';
-}
-export interface Filter {
-  page: number;
-  limit: number;
-  startDate?: Date;
-  endDate?: Date;
-  categoryId?: string;
-  budgetId?: string;
-  type?: 'EXPENSE' | 'INCOME';
-  minAmount?: number;
-  maxAmount?: number;
 }
 
 export type PaginatedExpenses = PaginatedResponse<Expense>;
