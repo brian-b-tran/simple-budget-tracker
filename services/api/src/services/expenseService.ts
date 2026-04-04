@@ -5,8 +5,8 @@ import type {
   UpdateExpenseBackendInput,
   CreateExpenseBackendInput,
   FilterExpenseInput,
+  PaginatedResponse,
 } from '@expense-app/types';
-import { PaginatedExpenses } from '../types/expense';
 import { getExchangeRateService } from './exchangeRateService';
 
 export async function getAllExpensesService(
@@ -151,7 +151,7 @@ export async function deleteExpenseService(
 export async function filterExpenseService(
   userId: string,
   filters: FilterExpenseInput
-): Promise<PaginatedExpenses> {
+): Promise<PaginatedResponse<Expense>> {
   const where = {
     userId: userId,
     ...(filters.categoryId && { categoryId: filters.categoryId }),
@@ -178,8 +178,8 @@ export async function filterExpenseService(
     }),
   ]);
 
-  const pages: PaginatedExpenses = {
-    expenses: filteredExpenses,
+  const pages: PaginatedResponse<Expense> = {
+    data: filteredExpenses,
     limit: filters.limit,
     total: total,
     page: filters.page,

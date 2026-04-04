@@ -1,4 +1,4 @@
-import { PaginatedResponse } from './apiTypes';
+import { PaginatedResponse } from '@expense-app/types';
 
 export interface Expense {
   id: string;
