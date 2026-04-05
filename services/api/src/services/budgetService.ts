@@ -45,7 +45,6 @@ export async function getBudgetService(
   //combine group by category amounts spent with categories to create BudgetCategoryBreakdowns
   const categoryBreakdownArray = CategoryGroups.map(
     (group): BudgetCategoryBreakdown => {
-      //match category ids to find category name
       const category = categories.find(
         (category) => category.id === group.categoryId
       );

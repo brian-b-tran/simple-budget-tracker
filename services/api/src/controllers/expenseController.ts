@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { filterExpenseSchema } from '../validators/expenseValidator';
+import { filterExpenseSchema } from '@expense-app/types';
 import {
   getAllExpensesService,
   getExpenseService,
@@ -9,9 +9,9 @@ import {
   filterExpenseService,
 } from '../services/expenseService';
 import {
-  createExpenseValidationSchema,
-  updateExpenseValidationSchema,
-} from '../validators/expenseValidator';
+  createExpenseBackendSchema,
+  updateExpenseBackendSchema,
+} from '@expense-app/types';
 
 export async function getAllExpensesController(
   req: Request,
@@ -52,7 +52,7 @@ export async function createExpenseController(
   req: Request,
   res: Response
 ): Promise<void> {
-  const body = createExpenseValidationSchema.safeParse(req.body);
+  const body = createExpenseBackendSchema.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ message: body.error });
     return;
@@ -74,7 +74,7 @@ export async function updateExpenseController(
   req: Request,
   res: Response
 ): Promise<void> {
-  const body = updateExpenseValidationSchema.safeParse(req.body);
+  const body = updateExpenseBackendSchema.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ message: body.error });
     return;

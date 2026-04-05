@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import {
-  createReminderSchema,
-  updateReminderSchema,
-} from '../validators/reminderValidator';
+  createReminderBackendSchema,
+  updateReminderBackendSchema,
+} from '@expense-app/types';
 import {
   getReminderService,
   getAllRemindersService,
@@ -50,7 +50,7 @@ export async function createReminderController(
   req: Request,
   res: Response
 ): Promise<void> {
-  const data = createReminderSchema.safeParse(req.body);
+  const data = createReminderBackendSchema.safeParse(req.body);
   if (!data.success) {
     res.status(400).json({ message: 'Invalid inputs.', error: data.error });
     return;
@@ -75,7 +75,7 @@ export async function updateReminderController(
   req: Request,
   res: Response
 ): Promise<void> {
-  const data = updateReminderSchema.safeParse(req.body);
+  const data = updateReminderBackendSchema.safeParse(req.body);
   if (!data.success) {
     res.status(400).json({ message: 'Invalid inputs.', error: data.error });
     return;

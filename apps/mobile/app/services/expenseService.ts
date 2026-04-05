@@ -7,9 +7,9 @@ import {
 import { PaginatedExpenses, Expense } from '../types/expenseTypes';
 import { handleError } from '../utils/serviceUtils';
 
-export async function getExpense(id: string): Promise<Expense> {
+export async function getExpense(expenseId: string): Promise<Expense> {
   try {
-    const { data } = await api.get<Expense>(`/expenses/${id}`);
+    const { data } = await api.get<Expense>(`/expenses/${expenseId}`);
     return data;
   } catch (error: any) {
     return handleError(error);
@@ -42,7 +42,7 @@ export async function createExpense(
   input: CreateExpenseFrontendInput
 ): Promise<Expense> {
   try {
-    const { data } = await api.post<Expense>(`/expenses/`, input);
+    const { data } = await api.post<Expense>(`/expenses`, input);
 
     return data;
   } catch (error: any) {
@@ -52,10 +52,10 @@ export async function createExpense(
 
 export async function updateExpense(
   input: UpdateExpenseFrontendInput,
-  id: string
+  expenseId: string
 ): Promise<Expense> {
   try {
-    const { data } = await api.put<Expense>(`/expenses/${id}`, input);
+    const { data } = await api.put<Expense>(`/expenses/${expenseId}`, input);
 
     return data;
   } catch (error: any) {
@@ -63,9 +63,9 @@ export async function updateExpense(
   }
 }
 
-export async function deleteExpense(id: string): Promise<Expense> {
+export async function deleteExpense(expenseId: string): Promise<Expense> {
   try {
-    const { data } = await api.delete<Expense>(`/expenses/${id}`);
+    const { data } = await api.delete<Expense>(`/expenses/${expenseId}`);
     return data;
   } catch (error: any) {
     return handleError(error);

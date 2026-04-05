@@ -7,9 +7,9 @@ import {
   deleteBudgetService,
 } from '../services/budgetService';
 import {
-  createBudgetSchema,
-  updateBudgetSchema,
-} from '../validators/budgetValidator';
+  createBudgetBackendSchema,
+  updateBudgetBackendSchema,
+} from '@expense-app/types';
 
 export async function getBudgetController(
   req: Request,
@@ -56,7 +56,7 @@ export async function createBudgetController(
   res: Response
 ): Promise<void> {
   try {
-    const budgetData = createBudgetSchema.safeParse(req.body);
+    const budgetData = createBudgetBackendSchema.safeParse(req.body);
     if (!budgetData.success) {
       res.status(400).json({ message: budgetData.error });
       return;
@@ -83,7 +83,7 @@ export async function updateBudgetController(
   res: Response
 ): Promise<void> {
   try {
-    const budgetData = updateBudgetSchema.safeParse(req.body);
+    const budgetData = updateBudgetBackendSchema.safeParse(req.body);
     if (!budgetData.success) {
       res.status(400).json({ message: budgetData.error });
       return;

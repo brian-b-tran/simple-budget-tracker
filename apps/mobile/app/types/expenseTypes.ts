@@ -14,6 +14,8 @@ export interface Expense {
   date: string;
   time: string;
   type: 'EXPENSE' | 'INCOME';
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type PaginatedExpenses = PaginatedResponse<Expense>;
