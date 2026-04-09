@@ -28,7 +28,7 @@ export const createBudget = async (
   input: CreateBudgetFrontendInput
 ): Promise<Budget> => {
   try {
-    const { data } = await api.post<Budget>(`/budgets`, { input });
+    const { data } = await api.post<Budget>(`/budgets`, input);
     return data;
   } catch (error: any) {
     return handleError(error);
@@ -40,7 +40,7 @@ export const updateBudget = async (
   input: UpdateBudgetFrontendInput
 ): Promise<Budget> => {
   try {
-    const { data } = await api.put<Budget>(`/budgets/${budgetId}`, { input });
+    const { data } = await api.put<Budget>(`/budgets/${budgetId}`, input);
     return data;
   } catch (error: any) {
     return handleError(error);
