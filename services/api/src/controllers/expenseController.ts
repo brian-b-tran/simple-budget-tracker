@@ -19,7 +19,7 @@ export async function getAllExpensesController(
 ): Promise<void> {
   try {
     const expenses = await getAllExpensesService(req.user!.userId);
-    res.status(200).json({ expenses: expenses });
+    res.status(200).json(expenses);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -38,7 +38,7 @@ export async function getExpenseController(
       req.user!.userId,
       req.params.id as string
     );
-    res.status(200).json({ expense: expense });
+    res.status(200).json(expense);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -60,7 +60,7 @@ export async function createExpenseController(
 
   try {
     const expense = await createExpenseService(req.user!.userId, body.data);
-    res.status(201).json({ expense: expense });
+    res.status(201).json(expense);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -86,7 +86,7 @@ export async function updateExpenseController(
       req.params.id as string,
       body.data
     );
-    res.status(200).json({ expense: expense });
+    res.status(200).json(expense);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -105,7 +105,7 @@ export async function deleteExpenseController(
       req.user!.userId,
       req.params.id as string
     );
-    res.status(200).json({ expenses: expenses });
+    res.status(200).json(expenses);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });

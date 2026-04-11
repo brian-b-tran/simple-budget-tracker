@@ -39,7 +39,7 @@ export async function getAllBudgetsController(
 ): Promise<void> {
   try {
     const allBudgets = await getAllBudgetsService(req.user!.userId);
-    res.status(200).json({ budgets: allBudgets });
+    res.status(200).json(allBudgets);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -66,7 +66,7 @@ export async function createBudgetController(
       budgetData.data
     );
 
-    res.status(201).json({ newBudget: newBudget });
+    res.status(201).json(newBudget);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -84,6 +84,7 @@ export async function updateBudgetController(
 ): Promise<void> {
   try {
     const budgetData = updateBudgetBackendSchema.safeParse(req.body);
+    console.log('Backend All Budgets Endpoint Service hit.');
     if (!budgetData.success) {
       res.status(400).json({ message: budgetData.error });
       return;
@@ -94,7 +95,7 @@ export async function updateBudgetController(
       budgetData.data
     );
 
-    res.status(200).json({ updatedBudget: updatedBudget });
+    res.status(200).json(updatedBudget);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
