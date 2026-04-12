@@ -7,52 +7,75 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useDashboard } from '../hooks/useDashboard';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function DashboardScreen() {
   const {
     activeBudgets,
     recentExpenses,
     upcomingReminders,
+    refreshDash,
     isLoading,
     errorState,
   } = useDashboard();
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    refreshDash();
+    setRefreshing(false);
+  }, []);
 
   if (isLoading) {
     return (
-      <SafeAreaProvider>
-        <SafeAreaView className=''>
-          <ActivityIndicator size='large' color='#00ff00' />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <SafeAreaView className='flex-1 items-center justify-center'>
+        <ActivityIndicator size='large' color='#ffff00' />
+      </SafeAreaView>
     );
   }
   if (errorState) {
     return (
-      <SafeAreaProvider>
-        <SafeAreaView>
-          <ScrollView refreshControl={<RefreshControl refreshing={true} />}>
-            <Text>An error occurred please refresh the page!</Text>
-            <Text>{errorState}</Text>
-          </ScrollView>
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <SafeAreaView className='flex-1'>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          contentContainerStyle={{ flex: 1, justifyContent: 'center' }}
+        >
+          <View>
+            <Text className='align-center text-center'>
+              An error occurred please refresh the page!
+            </Text>
+            <Text className='align-center text-center'>{errorState}</Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     );
   }
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }} className='bg-slate-50'>
-      <View>
-        <Text>Dashboard</Text>
-      </View>
-      <View>
-        <Text>Recent Expenses</Text>
-      </View>
-      <View>
-        <Text>Budgets</Text>
-      </View>
-      <View>
-        <Text>Upcoming Reminders</Text>
-      </View>
-    </ScrollView>
+    <SafeAreaView className='flex-1 bg-slate-50'>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        className='flex-1'
+        contentContainerStyle={{ padding: 4 }}
+      >
+        {/* Greeting */}
+        <View className='mb-6 ml-6 mr-6'>
+          <Text className='text-2xl font-bold text-slate-800'>
+            Hello there! 👋
+          </Text>
+          <Text className='text-slate-500 mt-1'>
+            Here's your financial overview
+          </Text>
+        </View>
+
+        {/* Budget Overview */}
+        <View className='mb-6 ml-6 mr-6'></View>
+        {/* Recent Expenses */}
+        {/* Upcoming Reminders */}
+      </ScrollView>
+    </SafeAreaView>
   );
 }

@@ -1,11 +1,13 @@
 import './global.css';
-import { NavigationContainer } from '@react-navigation/native';
 import { RootStack } from './app/navigation/AppNavigator';
 import { AuthProvider } from './app/store/authContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 export default function App() {
   return (
-    <AuthProvider>
-      <RootStack />
-    </AuthProvider>
+    <SafeAreaProvider className='flex-1'>
+      <AuthProvider>
+        <RootStack />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }
