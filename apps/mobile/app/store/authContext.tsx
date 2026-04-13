@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import React from 'react';
 import * as SecureStore from 'expo-secure-store';
 import {
@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
+  const accessTokenRef = useRef<string | null>(null);
   const login = async (email: string, password: string) => {
     try {
       console.log('trying to log in.');
@@ -56,12 +56,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await SecureStore.setItemAsync('accessToken', newToken.access);
       setAccessToken(newToken.access);
     } catch (error) {
+      console.error('Refresh Failed.');
       throw error;
     }
   };
+  useEffect(() => {
+    accessTokenRef.current = accessToken;
+  }, [accessToken]);
 
   //useEffect on startup
   useEffect(() => {
+    setupInterceptors(() => accessTokenRef.current, refresh, logout);
     const loadToken = async () => {
       setIsLoading(true);
       try {
@@ -78,10 +83,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
     loadToken();
   }, []);
-
-  useEffect(() => {
-    setupInterceptors(() => accessToken, refresh, logout);
-  }, [accessToken]);
 
   return (
     <AuthContext.Provider

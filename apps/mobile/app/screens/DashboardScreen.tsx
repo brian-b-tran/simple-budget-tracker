@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useDashboard } from '../hooks/useDashboard';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 export default function DashboardScreen() {
   const {
     activeBudgets,
@@ -72,7 +72,14 @@ export default function DashboardScreen() {
         </View>
 
         {/* Budget Overview */}
-        <View className='mb-6 ml-6 mr-6'></View>
+        <Card>
+          <CardHeader>
+            <CardTitle>Test Card</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Text>Hello from Card!</Text>
+          </CardContent>
+        </Card>
         {/* Recent Expenses */}
         {/* Upcoming Reminders */}
       </ScrollView>
