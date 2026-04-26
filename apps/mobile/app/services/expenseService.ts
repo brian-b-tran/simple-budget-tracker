@@ -10,7 +10,12 @@ import { handleError } from '../utils/serviceUtils';
 export async function getExpense(expenseId: string): Promise<Expense> {
   try {
     const { data } = await api.get<Expense>(`/expenses/${expenseId}`);
-    return data;
+    return {
+      ...data,
+      amountOriginal: Number(data.amountOriginal),
+      amountBase: Number(data.amountBase),
+      exchangeRateUsed: Number(data.exchangeRateUsed),
+    };
   } catch (error: any) {
     return handleError(error);
   }
@@ -32,7 +37,15 @@ export async function getFilteredExpenses(
     const { data } = await api.get<PaginatedExpenses>(`/expenses/filter`, {
       params: filter,
     });
-    return data;
+    return {
+      ...data,
+      data: data.data.map((expense) => ({
+        ...expense,
+        amountOriginal: Number(expense.amountOriginal),
+        amountBase: Number(expense.amountBase),
+        exchangeRateUsed: Number(expense.exchangeRateUsed),
+      })),
+    };
   } catch (error: any) {
     return handleError(error);
   }

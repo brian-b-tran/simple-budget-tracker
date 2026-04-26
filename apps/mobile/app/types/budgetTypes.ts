@@ -10,7 +10,7 @@ export interface Budget {
   startTime?: string;
   endTime?: string;
   notes?: string;
-  createAt: string;
+  createdAt: string;
   updatedAt: string;
 }
 

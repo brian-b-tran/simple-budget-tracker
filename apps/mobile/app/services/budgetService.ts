@@ -9,7 +9,13 @@ import api from './api';
 export const getAllBudgets = async (): Promise<Array<BudgetSummary>> => {
   try {
     const { data } = await api.get<Array<BudgetSummary>>(`/budgets`);
-    return data;
+    return data.map((budget) => ({
+      ...budget,
+      totalAmount: Number(budget.totalAmount),
+      totalSpent: Number(budget.totalSpent),
+      remaining: Number(budget.remaining),
+      percentageUsed: Number(budget.percentageUsed),
+    }));
   } catch (error: any) {
     return handleError(error);
   }
@@ -18,7 +24,13 @@ export const getAllBudgets = async (): Promise<Array<BudgetSummary>> => {
 export const getBudget = async (budgetId: string): Promise<BudgetSummary> => {
   try {
     const { data } = await api.get<BudgetSummary>(`/budgets/${budgetId}`);
-    return data;
+    return {
+      ...data,
+      totalAmount: Number(data.totalAmount),
+      totalSpent: Number(data.totalSpent),
+      remaining: Number(data.remaining),
+      percentageUsed: Number(data.percentageUsed),
+    };
   } catch (error: any) {
     return handleError(error);
   }
