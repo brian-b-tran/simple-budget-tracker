@@ -6,9 +6,9 @@ import { Budget, BudgetSummary } from '../types/budgetTypes';
 import { handleError } from '../utils/serviceUtils';
 import api from './api';
 
-export const getAllBudgets = async (): Promise<Array<Budget>> => {
+export const getAllBudgets = async (): Promise<Array<BudgetSummary>> => {
   try {
-    const { data } = await api.get<Array<Budget>>(`/budgets`);
+    const { data } = await api.get<Array<BudgetSummary>>(`/budgets`);
     return data;
   } catch (error: any) {
     return handleError(error);

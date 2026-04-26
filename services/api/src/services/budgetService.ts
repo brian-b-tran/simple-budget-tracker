@@ -68,7 +68,7 @@ export async function getBudgetService(
   );
 
   return {
-    budget: budget,
+    ...budget,
     totalSpent: totalSpent.toNumber(),
     remaining: remaining.toNumber(),
     percentageUsed: percentage.toNumber(),
@@ -81,6 +81,49 @@ export async function getAllBudgetsService(
 ): Promise<Array<Budget>> {
   const budgets = await prisma.budget.findMany({ where: { userId: userId } });
   return budgets;
+}
+
+export async function getAllBudgetSummariesService(
+  userId: string
+): Promise<Array<BudgetSummary>> {
+  const [budgets, expensesGroupedByBudget] = await Promise.all([
+    //total spent for all expenses
+    prisma.budget.findMany({ where: { userId: userId } }),
+    prisma.expense.groupBy({
+      by: ['budgetId'],
+      where: { userId: userId },
+      _sum: { amountBase: true },
+    }),
+  ]);
+
+  const budgetSummaryArray = budgets.map((budget): BudgetSummary => {
+    const groupedExpenses = expensesGroupedByBudget.find(
+      (group) => group.budgetId === budget.id
+    );
+    if (!groupedExpenses) {
+      return {
+        ...budget,
+        totalSpent: 0,
+        remaining: budget.totalAmount.toNumber(),
+        percentageUsed: 0,
+        categoryBreakdown: [],
+      };
+    }
+
+    const totalSpent = groupedExpenses._sum.amountBase ?? new Prisma.Decimal(0);
+    const remaining = budget.totalAmount.sub(totalSpent);
+    const percentage = totalSpent.div(budget.totalAmount).times(100);
+
+    return {
+      ...budget,
+      totalSpent: totalSpent.toNumber(),
+      remaining: remaining.toNumber(),
+      percentageUsed: percentage.toNumber(),
+      categoryBreakdown: [],
+    };
+  });
+
+  return budgetSummaryArray;
 }
 
 export async function createBudgetService(

@@ -1,6 +1,5 @@
 import { Budget } from '../../generated/prisma/client';
-export type BudgetSummary = {
-  budget: Budget;
+export type BudgetSummary = Budget & {
   totalSpent: number;
   remaining: number;
   percentageUsed: number;

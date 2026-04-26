@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import {
   getBudgetService,
   getAllBudgetsService,
+  getAllBudgetSummariesService,
   createBudgetService,
   updateBudgetService,
   deleteBudgetService,
@@ -38,7 +39,7 @@ export async function getAllBudgetsController(
   res: Response
 ): Promise<void> {
   try {
-    const allBudgets = await getAllBudgetsService(req.user!.userId);
+    const allBudgets = await getAllBudgetSummariesService(req.user!.userId);
     res.status(200).json(allBudgets);
   } catch (error) {
     if (error instanceof Error) {
