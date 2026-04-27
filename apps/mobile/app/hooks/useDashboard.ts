@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { BudgetSummary } from '../types/budgetTypes';
-import { PaginatedExpenses } from '../types/expenseTypes';
+import { PaginatedExpense } from '../types/expenseTypes';
 import { Reminder } from '../types/reminderTypes';
 import { getAllBudgets } from '../services/budgetService';
 import { getFilteredExpenses } from '../services/expenseService';
@@ -8,7 +8,7 @@ import { getUpcomingReminders } from '../services/reminderService';
 
 export function useDashboard() {
   const [activeBudgets, setActiveBudgets] = useState<BudgetSummary[]>([]);
-  const [recentExpenses, setRecentExpenses] = useState<PaginatedExpenses>();
+  const [recentExpenses, setRecentExpenses] = useState<PaginatedExpense>();
   const [upcomingReminders, setUpcomingReminders] = useState<Reminder[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorState, setErrorState] = useState<string | null>(null);

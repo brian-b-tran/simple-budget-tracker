@@ -18,4 +18,4 @@ export interface Expense {
   updatedAt: string;
 }
 
-export type PaginatedExpenses = PaginatedResponse<Expense>;
+export type PaginatedExpense = PaginatedResponse<Expense>;

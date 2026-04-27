@@ -4,7 +4,7 @@ import {
   UpdateExpenseFrontendInput,
   FilterExpenseInput,
 } from '@expense-app/types';
-import { PaginatedExpenses, Expense } from '../types/expenseTypes';
+import { PaginatedExpense, Expense } from '../types/expenseTypes';
 import { handleError } from '../utils/serviceUtils';
 
 export async function getExpense(expenseId: string): Promise<Expense> {
@@ -32,9 +32,9 @@ export async function getAllExpenses(): Promise<Array<Expense>> {
 
 export async function getFilteredExpenses(
   filter: FilterExpenseInput
-): Promise<PaginatedExpenses> {
+): Promise<PaginatedExpense> {
   try {
-    const { data } = await api.get<PaginatedExpenses>(`/expenses/filter`, {
+    const { data } = await api.get<PaginatedExpense>(`/expenses/filter`, {
       params: filter,
     });
     return {

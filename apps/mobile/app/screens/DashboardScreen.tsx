@@ -8,7 +8,9 @@ import {
 } from 'react-native';
 import { useDashboard } from '../hooks/useDashboard';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import BudgetCard from '@/components/budget/BudgetCard';
+import ExpenseRow from '@/components/expense/ExpenseRow';
+import { Expense } from '../types/expenseTypes';
 export default function DashboardScreen() {
   const {
     activeBudgets,
@@ -63,24 +65,32 @@ export default function DashboardScreen() {
       >
         {/* Greeting */}
         <View className='mb-6 ml-6 mr-6'>
-          <Text className='text-2xl font-bold text-slate-800'>
+          <Text className='text-3xl font-bold text-slate-800'>
             Hello there! 👋
           </Text>
           <Text className='text-slate-500 mt-1'>
             Here's your financial overview
           </Text>
         </View>
-
+        <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+          Budgets
+        </Text>
         {/* Budget Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Test Card</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Text>Hello from Card!</Text>
-          </CardContent>
-        </Card>
+        {activeBudgets &&
+          activeBudgets.map((budget) => (
+            <BudgetCard key={budget.id} budget={budget} />
+          ))}
+        <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+          Recent Expenses
+        </Text>
         {/* Recent Expenses */}
+        {recentExpenses &&
+          recentExpenses.data.map((expense: Expense) => (
+            <ExpenseRow key={expense.id} expense={expense} />
+          ))}
+        <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+          Upcoming Reminders
+        </Text>
         {/* Upcoming Reminders */}
       </ScrollView>
     </SafeAreaView>
