@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { BudgetSummary } from '../../app/types/budgetTypes';
+import { BudgetSummary } from '../../types/budgetTypes';
 import {
   Card,
   CardContent,

@@ -8,9 +8,11 @@ import {
 } from 'react-native';
 import { useDashboard } from '../hooks/useDashboard';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import BudgetCard from '@/components/budget/BudgetCard';
-import ExpenseRow from '@/components/expense/ExpenseRow';
+import BudgetCard from '@/app/components/budget/BudgetCard';
+import ExpenseRow from '@/app/components/expense/ExpenseRow';
 import { Expense } from '../types/expenseTypes';
+import { Reminder } from '../types/reminderTypes';
+import ReminderRow from '../components/reminder/reminderRow';
 export default function DashboardScreen() {
   const {
     activeBudgets,
@@ -22,9 +24,9 @@ export default function DashboardScreen() {
   } = useDashboard();
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    refreshDash();
+    await refreshDash();
     setRefreshing(false);
   }, []);
 
@@ -72,26 +74,47 @@ export default function DashboardScreen() {
             Here's your financial overview
           </Text>
         </View>
-        <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
-          Budgets
-        </Text>
         {/* Budget Overview */}
-        {activeBudgets &&
-          activeBudgets.map((budget) => (
-            <BudgetCard key={budget.id} budget={budget} />
-          ))}
-        <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
-          Recent Expenses
-        </Text>
+        {activeBudgets && activeBudgets.length > 0 ? (
+          <View>
+            <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+              Budgets
+            </Text>
+            {activeBudgets.map((budget) => (
+              <BudgetCard key={budget.id} budget={budget} />
+            ))}
+          </View>
+        ) : (
+          <Text className='text-slate-400 ml-6 mt-2'>No budgets yet</Text>
+        )}
+
         {/* Recent Expenses */}
-        {recentExpenses &&
-          recentExpenses.data.map((expense: Expense) => (
-            <ExpenseRow key={expense.id} expense={expense} />
-          ))}
-        <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
-          Upcoming Reminders
-        </Text>
+        {recentExpenses && recentExpenses.data.length > 0 ? (
+          <View>
+            <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+              Recent Expenses
+            </Text>
+            {recentExpenses.data.map((expense: Expense) => (
+              <ExpenseRow key={expense.id} expense={expense} />
+            ))}
+          </View>
+        ) : (
+          <Text className='text-slate-400 ml-6 mt-2'>No Expenses yet</Text>
+        )}
+
         {/* Upcoming Reminders */}
+        {upcomingReminders && upcomingReminders.length > 0 ? (
+          <View>
+            <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+              Reminders
+            </Text>
+            {upcomingReminders.map((reminder: Reminder) => (
+              <ReminderRow key={reminder.id} reminder={reminder} />
+            ))}
+          </View>
+        ) : (
+          <Text className='text-slate-400 ml-6 mt-2'>No Reminders yet</Text>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

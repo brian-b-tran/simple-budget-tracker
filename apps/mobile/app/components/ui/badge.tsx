@@ -1,4 +1,4 @@
-import { TextClassContext } from '@/components/ui/text';
+import { TextClassContext } from '@/app/components/ui/text';
 import { cn } from '@/lib/utils';
 import * as Slot from '@rn-primitives/slot';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -26,7 +26,9 @@ const badgeVariants = cva(
           'bg-destructive border-transparent',
           Platform.select({ web: '[a&]:hover:bg-destructive/90' })
         ),
-        outline: Platform.select({ web: '[a&]:hover:bg-accent [a&]:hover:text-accent-foreground' }),
+        outline: Platform.select({
+          web: '[a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
+        }),
       },
     },
     defaultVariants: {
@@ -50,14 +52,17 @@ const badgeTextVariants = cva('text-xs font-medium', {
 });
 
 type BadgeProps = React.ComponentProps<typeof View> & {
-    asChild?: boolean;
-  } & VariantProps<typeof badgeVariants>;
+  asChild?: boolean;
+} & VariantProps<typeof badgeVariants>;
 
 function Badge({ className, variant, asChild, ...props }: BadgeProps) {
   const Component = asChild ? Slot.View : View;
   return (
     <TextClassContext.Provider value={badgeTextVariants({ variant })}>
-      <Component className={cn(badgeVariants({ variant }), className)} {...props} />
+      <Component
+        className={cn(badgeVariants({ variant }), className)}
+        {...props}
+      />
     </TextClassContext.Provider>
   );
 }
