@@ -5,9 +5,9 @@ export const expenseBaseSchema = z.object({
     .number()
     .refine((val) => val !== 0, { message: 'Amount cannot be zero' }),
   categoryId: z.uuid().min(1),
-  date: z.coerce.date(),
-  time: z.coerce.date(),
-  type: z.enum(['EXPENSE', 'INCOME']).default('EXPENSE'),
+  date: z.date(),
+  time: z.date(),
+  type: z.enum(['EXPENSE', 'INCOME']),
   currencyOriginal: z.string().length(3),
   budgetId: z.string().optional(),
   recurringExpenseId: z.string().optional(),

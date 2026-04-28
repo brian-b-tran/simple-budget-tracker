@@ -8,6 +8,7 @@ import {
   registerService,
 } from '../services/authService';
 import { setupInterceptors } from '../services/api';
+import authEvents from '../utils/authEvents';
 
 interface AuthContextType {
   accessToken: string | null;
@@ -66,8 +67,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   //useEffect on startup
   useEffect(() => {
-    console.log('Auth startup');
-    setupInterceptors(() => accessTokenRef.current, refresh, logout);
+    const unsubscribe = authEvents.on(logout);
+    setupInterceptors(() => accessTokenRef.current, refresh);
     const loadToken = async () => {
       setIsLoading(true);
       try {
@@ -83,6 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
     loadToken();
+    return () => unsubscribe();
   }, []);
 
   return (

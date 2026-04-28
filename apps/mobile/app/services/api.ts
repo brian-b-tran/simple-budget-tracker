@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { config } from 'zod/v4/core';
+import authEvents from '../utils/authEvents';
 
 const api = axios.create({
   baseURL: 'http://10.0.2.2:3000',
@@ -37,7 +38,7 @@ export function setupInterceptors(
           originalRequest.headers['Authorization'] = `Bearer ${token}`;
           return api(originalRequest);
         } catch {
-          await logout();
+          authEvents.emit();
           throw error;
         }
       }
