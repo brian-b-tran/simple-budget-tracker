@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { config } from 'zod/v4/core';
 import authEvents from '../utils/authEvents';
 
 const api = axios.create({
@@ -11,8 +10,7 @@ const api = axios.create({
 
 export function setupInterceptors(
   getToken: () => string | null,
-  refresh: () => Promise<void>,
-  logout: () => Promise<void>
+  refresh: () => Promise<void>
 ) {
   //attach access token
   api.interceptors.request.use((config) => {

@@ -2,6 +2,7 @@
 const { getDefaultConfig } = require('expo/metro-config');
 const { withNativeWind } = require('nativewind/metro');
 const path = require('path');
+
 const {
   wrapWithReanimatedMetroConfig,
 } = require('react-native-reanimated/metro-config');
@@ -23,6 +24,9 @@ config.resolver.resolverMainFields = [
   'browser',
   'main',
 ];
+config.resolver.extraNodeModules = {
+  '@expense-app/types': path.resolve(workspaceRoot, 'packages/types'),
+};
 config.resolver.disableHierarchicalLookup = true;
 
 const reanimatedConfig = wrapWithReanimatedMetroConfig(config);

@@ -12,7 +12,7 @@ export async function getAllCategoryController(
 ): Promise<void> {
   try {
     const categories = await getAllCategoriesService(req.user!.userId);
-    res.status(200).json({ categories: categories });
+    res.status(200).json(categories);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
