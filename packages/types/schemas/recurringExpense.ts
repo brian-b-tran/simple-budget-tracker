@@ -7,12 +7,12 @@ export const recurringExpenseBaseSchema = z.object({
   currencyOriginal: z.string().length(3).optional(),
   categoryId: z.uuid(),
   frequency: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']),
-  interval: z.int().positive().default(1),
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date().optional(),
+  interval: z.int().positive(),
+  startDate: z.date(),
+  endDate: z.date().optional(),
   budgetId: z.uuid().optional(),
   notes: z.string().optional(),
-  type: z.enum(['EXPENSE', 'INCOME']).default('EXPENSE'),
+  type: z.enum(['EXPENSE', 'INCOME']),
 });
 
 export const createRecurringExpenseFrontendSchema = recurringExpenseBaseSchema;
