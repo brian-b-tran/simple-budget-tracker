@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -16,19 +16,38 @@ export default function ExpensesScreen() {
   const {
     recentExpenses,
     refreshExpenses,
+    expenseTotals,
     loadMoreExpenses,
-    isLoading,
+    totalsLoading,
+    refreshTotal,
+    listLoading,
     errorState,
+    hasMore,
   } = useExpenses();
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selected, setSelected] = useState<CycleKey>('today');
 
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     await refreshExpenses();
+    await refreshTotal();
     setRefreshing(false);
   }, []);
 
-  if (isLoading) {
+  const cycleOrder = ['today', 'week', 'month', 'year'] as const;
+
+  type CycleKey = (typeof cycleOrder)[number];
+
+  function cycleTotals() {
+    setSelected((prev) => {
+      const index = cycleOrder.indexOf(prev);
+      const nextIndex = (index + 1) % cycleOrder.length;
+      return cycleOrder[nextIndex];
+    });
+  }
+  const displayedTotal = expenseTotals?.[selected] ?? 0;
+
+  if (listLoading || totalsLoading) {
     return (
       <SafeAreaView className='flex-1 items-center justify-center'>
         <ActivityIndicator size='large' color='#ffff00' />
@@ -66,12 +85,17 @@ export default function ExpensesScreen() {
         {/* Greeting */}
         <View className='mb-6 ml-6 mr-6'>
           <Text className='text-3xl font-bold text-slate-800'>
-            Hello there! 👋
+            ${displayedTotal.toFixed(2)}
           </Text>
-          <Text className='text-slate-500 mt-1'>
-            Here's your financial overview
-          </Text>
+
+          <Text>Showing: {selected}</Text>
+
+          {/* Cycle button */}
+          <TouchableOpacity onPress={cycleTotals}>
+            <Text>Cycle</Text>
+          </TouchableOpacity>
         </View>
+
         {/* Recent Expenses */}
         {recentExpenses && recentExpenses.data.length > 0 ? (
           <View>
@@ -84,8 +108,8 @@ export default function ExpensesScreen() {
 
             <TouchableOpacity
               onPress={loadMoreExpenses}
-              disabled={isLoading}
-              className={`h-14 rounded-xl items-center justify-center ${isLoading ? 'bg-slate-200' : 'bg-slate-400'}`}
+              disabled={!hasMore}
+              className={`h-14 rounded-xl items-center justify-center ${!hasMore ? 'hidden' : 'bg-slate-400'}`}
             >
               <Text className='text-white-400 text-xl'>Load More</Text>
             </TouchableOpacity>

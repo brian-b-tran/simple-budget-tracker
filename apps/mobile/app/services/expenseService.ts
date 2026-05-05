@@ -4,7 +4,11 @@ import {
   UpdateExpenseFrontendInput,
   FilterExpenseInput,
 } from '@expense-app/types';
-import { PaginatedExpense, Expense } from '../types/expenseTypes';
+import {
+  PaginatedExpense,
+  Expense,
+  ExpenseTotals,
+} from '../types/expenseTypes';
 import { handleError } from '../utils/serviceUtils';
 
 export async function getExpense(expenseId: string): Promise<Expense> {
@@ -24,6 +28,17 @@ export async function getExpense(expenseId: string): Promise<Expense> {
 export async function getAllExpenses(): Promise<Array<Expense>> {
   try {
     const { data } = await api.get<Array<Expense>>(`/expenses`);
+    return data;
+  } catch (error: any) {
+    return handleError(error);
+  }
+}
+export async function getExpenseTotals(): Promise<ExpenseTotals> {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  try {
+    const { data } = await api.get<ExpenseTotals>(`/expenses/totals`, {
+      params: { timeZone },
+    });
     return data;
   } catch (error: any) {
     return handleError(error);

@@ -6,9 +6,10 @@ import type {
   CreateExpenseBackendInput,
   FilterExpenseInput,
   PaginatedResponse,
+  RangeKey,
 } from '@expense-app/types';
 import { getExchangeRateService } from './exchangeRateService';
-
+import { getDateRange } from '@expense-app/shared';
 export async function getAllExpensesService(
   userId: string
 ): Promise<Array<Expense>> {
@@ -152,25 +153,45 @@ export async function filterExpenseService(
   userId: string,
   filters: FilterExpenseInput
 ): Promise<PaginatedResponse<Expense>> {
+  let dateFilter = {};
+
+  if (filters.range && filters.timeZone) {
+    const { start, end } = getDateRange(filters.range, filters.timeZone);
+
+    dateFilter = {
+      date: {
+        gte: start,
+        lte: end,
+      },
+    };
+  } else if (filters.startDate && filters.endDate) {
+    dateFilter = {
+      date: {
+        gte: filters.startDate,
+        lte: filters.endDate,
+      },
+    };
+  }
+
   const where = {
     userId: userId,
     ...(filters.categoryId && { categoryId: filters.categoryId }),
     ...(filters.type && { type: filters.type }),
     ...(filters.budgetId && { budgetId: filters.budgetId }),
-    ...(filters.startDate &&
-      filters.endDate && {
-        date: { gte: filters.startDate, lte: filters.endDate },
+    ...(filters.minAmount != null &&
+      filters.maxAmount != null && {
+        amountOriginal: {
+          gte: filters.minAmount,
+          lte: filters.maxAmount,
+        },
       }),
-    ...(filters.minAmount &&
-      filters.maxAmount && {
-        amountOriginal: { gte: filters.minAmount, lte: filters.maxAmount },
-      }),
+    ...dateFilter,
   };
 
   const [filteredExpenses, total] = await Promise.all([
     prisma.expense.findMany({
       where: where,
-      orderBy: { [filters.sortBy]: filters.sortOrder },
+      orderBy: [{ [filters.sortBy]: filters.sortOrder }, { id: 'desc' }],
       skip: (filters.page - 1) * filters.limit,
       take: filters.limit,
     }),
@@ -190,25 +211,27 @@ export async function filterExpenseService(
   return pages;
 }
 
-// export async function getExpenseTotals(
-//   userId: string
-// ): Promise<Array<Expense>> {
-//   const [expenseSumTotal, expenseSumDay] = await Promise.all([
-//     //total spent for all expenses
-//     prisma.expense.aggregate({
-//       where: { userId: userId },
-//       _sum: { amountBase: true },
-//     }),
-//     //total spent grouped by day, week, month, year
-//     prisma.expense.aggregate({
-//       where: {
-//         userId: userId,
-//         date: {
-//           gte: new Date(new Date().setHours(0, 0, 0, 0)),
-//           lte: new Date(new Date().setHours(23, 59, 59, 999)),
-//         },
-//       },
-//       _sum: { amountBase: true },
-//     }),
-//   ]);
-// }
+export async function getExpenseTotalsService(
+  userId: string,
+  timeZone: string
+) {
+  const ranges: RangeKey[] = ['today', 'week', 'month', 'year'];
+
+  const results = await Promise.all(
+    ranges.map(async (range) => {
+      const { start, end } = getDateRange(range, timeZone);
+
+      const res = await prisma.expense.aggregate({
+        where: {
+          userId,
+          date: { gte: start, lte: end },
+        },
+        _sum: { amountOriginal: true },
+      });
+
+      return [range, Number(res._sum.amountOriginal ?? 0)] as const;
+    })
+  );
+
+  return Object.fromEntries(results);
+}

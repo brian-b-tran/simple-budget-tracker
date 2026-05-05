@@ -1,80 +1,100 @@
 import { useCallback, useEffect, useState } from 'react';
-import { PaginatedExpense } from '../types/expenseTypes';
-import { getFilteredExpenses } from '../services/expenseService';
+import { ExpenseTotals, PaginatedExpense } from '../types/expenseTypes';
+import {
+  getExpenseTotals,
+  getFilteredExpenses,
+} from '../services/expenseService';
 import { FilterExpenseInput } from '@expense-app/types';
 
 export function useExpenses() {
+  // list state
   const [recentExpenses, setRecentExpenses] = useState<PaginatedExpense>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [listLoading, setListLoading] = useState(false);
+
+  // totals state
+  const [expenseTotals, setExpenseTotals] = useState<ExpenseTotals>();
+  const [totalsLoading, setTotalsLoading] = useState(false);
+
   const [errorState, setErrorState] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
+
   const [filters, setFilters] = useState<FilterExpenseInput>({
-    page: page,
+    page: 1,
     limit: 10,
     sortBy: 'date',
     sortOrder: 'desc',
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
-  const [expenseTotals, setExpenseTotals] = useState({});
-  const loadTotals = async (): Promise<void> => {
+  const [hasMore, setHasMore] = useState(true);
+  const loadTotals = useCallback(async () => {
     try {
-      setIsLoading(true);
-      console.log('Loading More Expenses.');
-      const expenses = await getFilteredExpenses({
-        ...filters,
-        page: page + 1,
-      });
-      setPage((prev) => prev + 1);
-      setRecentExpenses((prev) => ({
-        ...expenses,
-        data: [...(prev?.data ?? []), ...expenses.data],
-      }));
+      setTotalsLoading(true);
+      setErrorState(null);
+      const totals = await getExpenseTotals();
 
-      console.log(`Items Loaded: PaginatedExpenses: ${expenses.data.length}`);
+      setExpenseTotals(totals);
     } catch (error: any) {
-      const errorMsg = error.message
-        ? error.message
-        : 'Unexpected Error occurred.';
-      setErrorState(errorMsg);
+      setErrorState(error.message ?? 'Unexpected error');
     } finally {
-      setIsLoading(false);
+      setTotalsLoading(false);
     }
-  };
-  const loadMoreExpenses = async (): Promise<void> => {
+  }, []);
+
+  const loadMoreExpenses = async () => {
     try {
-      setIsLoading(true);
-      console.log('Loading More Expenses.');
+      setErrorState(null);
+      console.log('more expenses');
+      if (!hasMore) return;
+
+      const nextPage = filters.page + 1;
+
       const expenses = await getFilteredExpenses({
         ...filters,
-        page: page + 1,
+        page: nextPage,
       });
-      setPage((prev) => prev + 1);
+
+      if (filters.page >= expenses.totalPages) {
+        setHasMore(false);
+        return;
+      }
+      if (expenses.data.length === 0) {
+        setHasMore(false);
+        return;
+      }
+
+      setFilters((prev) => ({ ...prev, page: nextPage }));
+      for (let i = 0; i < expenses.data.length; i++) {
+        console.log(expenses.data[i].id);
+      }
+      console.log(`Items Loaded: PaginatedExpenses: ${expenses.data.length}`);
       setRecentExpenses((prev) => ({
         ...expenses,
         data: [...(prev?.data ?? []), ...expenses.data],
       }));
-
-      console.log(`Items Loaded: PaginatedExpenses: ${expenses.data.length}`);
     } catch (error: any) {
       const errorMsg = error.message
         ? error.message
         : 'Unexpected Error occurred.';
       setErrorState(errorMsg);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const loadRecentExpenses = useCallback(async (): Promise<void> => {
     try {
-      setIsLoading(true);
+      setErrorState(null);
+      setListLoading(true);
+      setHasMore(true);
+
       console.log('Loading Expenses.');
       const expenses = await getFilteredExpenses({
         page: 1,
         limit: 10,
         sortBy: 'date',
         sortOrder: 'desc',
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
+      setFilters((prev) => ({ ...prev, page: 1 }));
       setRecentExpenses(expenses);
+
       console.log(`Items Loaded: PaginatedExpenses: ${expenses.data.length}`);
     } catch (error: any) {
       const errorMsg = error.message
@@ -82,19 +102,27 @@ export function useExpenses() {
         : 'Unexpected Error occurred.';
       setErrorState(errorMsg);
     } finally {
-      setIsLoading(false);
+      setListLoading(false);
     }
-  }, [filters]);
+  }, [filters.limit, filters.sortBy, filters.sortOrder, filters.timeZone]);
 
   useEffect(() => {
     loadRecentExpenses();
-  }, []);
+  }, [loadRecentExpenses]);
+
+  useEffect(() => {
+    loadTotals();
+  }, [loadTotals]);
 
   return {
     recentExpenses,
+    expenseTotals,
     loadMoreExpenses,
     refreshExpenses: loadRecentExpenses,
-    isLoading,
+    refreshTotal: loadTotals,
+    totalsLoading,
+    listLoading,
     errorState,
+    hasMore,
   };
 }

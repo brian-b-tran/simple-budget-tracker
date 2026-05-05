@@ -18,4 +18,10 @@ export interface Expense {
   updatedAt: string;
 }
 
+export interface ExpenseTotals {
+  today: number;
+  week: number;
+  month: number;
+  year: number;
+}
 export type PaginatedExpense = PaginatedResponse<Expense>;

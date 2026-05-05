@@ -25,6 +25,7 @@ export function useDashboard() {
           limit: 10,
           sortBy: 'date',
           sortOrder: 'desc',
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
         getUpcomingReminders(),
       ]);

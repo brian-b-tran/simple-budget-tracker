@@ -6,6 +6,7 @@ import {
   updateExpenseController,
   deleteExpenseController,
   filterExpenseController,
+  getExpenseTotalsController,
 } from '../controllers/expenseController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
@@ -13,6 +14,7 @@ const expenseRouter = Router();
 
 expenseRouter.get('/', authMiddleware, getAllExpensesController);
 expenseRouter.get('/filter', authMiddleware, filterExpenseController);
+expenseRouter.get('/totals', authMiddleware, getExpenseTotalsController);
 expenseRouter.get('/:id', authMiddleware, getExpenseController);
 expenseRouter.post('/', authMiddleware, createExpenseController);
 expenseRouter.put('/:id', authMiddleware, updateExpenseController);

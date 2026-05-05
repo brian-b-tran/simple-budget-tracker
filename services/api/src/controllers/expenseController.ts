@@ -1,5 +1,8 @@
 import { Request, Response } from 'express';
-import { filterExpenseSchema } from '@expense-app/types';
+import {
+  filterExpenseSchema,
+  getExpenseTotalsQuerySchema,
+} from '@expense-app/types';
 import {
   getAllExpensesService,
   getExpenseService,
@@ -7,6 +10,7 @@ import {
   updateExpenseService,
   deleteExpenseService,
   filterExpenseService,
+  getExpenseTotalsService,
 } from '../services/expenseService';
 import {
   createExpenseBackendSchema,
@@ -130,6 +134,31 @@ export async function filterExpenseController(
       filter.data
     );
     res.status(200).json(filteredExpense);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+}
+
+export async function getExpenseTotalsController(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const result = getExpenseTotalsQuerySchema.safeParse(req.query);
+
+  if (!result.success) {
+    res.status(400).json({ message: 'Must provide a timeZone in Request.' });
+    return;
+  }
+
+  const { timeZone } = result.data;
+
+  try {
+    const totals = await getExpenseTotalsService(req.user!.userId, timeZone);
+    res.status(200).json(totals);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
