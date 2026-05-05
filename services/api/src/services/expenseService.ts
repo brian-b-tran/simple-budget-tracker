@@ -189,3 +189,26 @@ export async function filterExpenseService(
 
   return pages;
 }
+
+// export async function getExpenseTotals(
+//   userId: string
+// ): Promise<Array<Expense>> {
+//   const [expenseSumTotal, expenseSumDay] = await Promise.all([
+//     //total spent for all expenses
+//     prisma.expense.aggregate({
+//       where: { userId: userId },
+//       _sum: { amountBase: true },
+//     }),
+//     //total spent grouped by day, week, month, year
+//     prisma.expense.aggregate({
+//       where: {
+//         userId: userId,
+//         date: {
+//           gte: new Date(new Date().setHours(0, 0, 0, 0)),
+//           lte: new Date(new Date().setHours(23, 59, 59, 999)),
+//         },
+//       },
+//       _sum: { amountBase: true },
+//     }),
+//   ]);
+// }

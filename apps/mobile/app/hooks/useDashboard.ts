@@ -20,7 +20,12 @@ export function useDashboard() {
       console.log('Loading Dashboard');
       const [budgets, expenses, reminders] = await Promise.all([
         getAllBudgets(),
-        getFilteredExpenses({ page: 1, limit: 10 }),
+        getFilteredExpenses({
+          page: 1,
+          limit: 10,
+          sortBy: 'date',
+          sortOrder: 'desc',
+        }),
         getUpcomingReminders(),
       ]);
       setActiveBudgets(budgets);
