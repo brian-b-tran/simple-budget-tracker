@@ -1,9 +1,10 @@
 import prisma from '../config/db';
 import { RecurringExpense } from '../../generated/prisma/client';
 import type {
-  CreateRecurringInput,
-  UpdateRecurringInput,
-} from '../validators/recurringExpenseValidator';
+  CreateRecurringExpenseBackendInput,
+  UpdateRecurringExpenseBackendInput,
+} from '@expense-app/types';
+import { getExchangeRateService } from './exchangeRateService';
 
 export async function getRecurringExpenseService(
   userId: string,
@@ -32,7 +33,7 @@ export async function getAllRecurringExpenseService(
 
 export async function createRecurringExpenseService(
   userId: string,
-  data: CreateRecurringInput
+  data: CreateRecurringExpenseBackendInput
 ): Promise<RecurringExpense> {
   const category = await prisma.category.findUnique({
     where: { id: data.categoryId, userId: userId },
@@ -49,23 +50,59 @@ export async function createRecurringExpenseService(
   if (!user.currency) {
     throw new Error('User has no base currency set.');
   }
-  const newRecurringExpense = await prisma.recurringExpense.create({
-    data: {
-      userId: userId,
-      amountOriginal: data.amountOriginal,
-      currencyOriginal: data.currencyOriginal
-        ? data.currencyOriginal
-        : user.currency,
-      categoryId: data.categoryId,
-      frequency: data.frequency,
-      interval: data.interval,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      budgetId: data.budgetId,
-      notes: data.notes,
-      type: data.type,
-      nextRunDate: data.startDate,
-    },
+  let amountBase;
+  let exchangeRateUsed;
+
+  if (user.currency === data.currencyOriginal) {
+    amountBase = data.amountOriginal;
+    exchangeRateUsed = 1;
+  } else {
+    const rate = await getExchangeRateService(
+      data.currencyOriginal ?? user.currency,
+      user.currency!
+    );
+    exchangeRateUsed = rate.rate;
+    amountBase = exchangeRateUsed.mul(data.amountOriginal).toNumber();
+  }
+
+  const [newRecurringExpense] = await prisma.$transaction(async (tx) => {
+    const recurringExpense = await tx.recurringExpense.create({
+      data: {
+        userId: userId,
+        amountOriginal: data.amountOriginal,
+        currencyOriginal: data.currencyOriginal
+          ? data.currencyOriginal
+          : user.currency!,
+        categoryId: data.categoryId,
+        frequency: data.frequency,
+        interval: data.interval,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        budgetId: data.budgetId,
+        notes: data.notes,
+        type: data.type,
+        nextRunDate: data.startDate,
+      },
+    });
+
+    await tx.expense.create({
+      data: {
+        userId: userId,
+        amountOriginal: recurringExpense.amountOriginal,
+        currencyOriginal: recurringExpense.currencyOriginal,
+        categoryId: recurringExpense.categoryId,
+        budgetId: recurringExpense.budgetId,
+        recurringExpenseId: recurringExpense.id,
+        notes: recurringExpense.notes,
+        date: data.startDate,
+        time: data.startDate,
+        type: recurringExpense.type,
+        amountBase: amountBase,
+        exchangeRateUsed: exchangeRateUsed,
+      },
+    });
+
+    return [recurringExpense];
   });
 
   return newRecurringExpense;
@@ -74,7 +111,7 @@ export async function createRecurringExpenseService(
 export async function updateRecurringExpenseService(
   userId: string,
   recurringId: string,
-  data: UpdateRecurringInput
+  data: UpdateRecurringExpenseBackendInput
 ): Promise<RecurringExpense> {
   const oldRecurringExpense = await prisma.recurringExpense.findUnique({
     where: { id: recurringId, userId: userId },

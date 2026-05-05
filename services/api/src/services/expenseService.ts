@@ -2,11 +2,11 @@ import prisma from '../config/db';
 import { Expense } from '../../generated/prisma/client';
 
 import type {
-  UpdateExpenseInput,
-  CreateExpenseInput,
+  UpdateExpenseBackendInput,
+  CreateExpenseBackendInput,
   FilterExpenseInput,
-} from '../validators/expenseValidator';
-import { PaginatedExpenses } from '../types/expense';
+  PaginatedResponse,
+} from '@expense-app/types';
 import { getExchangeRateService } from './exchangeRateService';
 
 export async function getAllExpensesService(
@@ -39,7 +39,7 @@ export async function getExpenseService(
 
 export async function createExpenseService(
   userId: string,
-  data: CreateExpenseInput
+  data: CreateExpenseBackendInput
 ): Promise<Expense> {
   const category = await prisma.category.findUnique({
     where: { id: data.categoryId, userId: userId },
@@ -93,7 +93,7 @@ export async function createExpenseService(
 export async function updateExpenseService(
   userId: string,
   expenseId: string,
-  data: UpdateExpenseInput
+  data: UpdateExpenseBackendInput
 ): Promise<Expense> {
   if (data.categoryId) {
     const category = await prisma.category.findUnique({
@@ -151,7 +151,7 @@ export async function deleteExpenseService(
 export async function filterExpenseService(
   userId: string,
   filters: FilterExpenseInput
-): Promise<PaginatedExpenses> {
+): Promise<PaginatedResponse<Expense>> {
   const where = {
     userId: userId,
     ...(filters.categoryId && { categoryId: filters.categoryId }),
@@ -170,6 +170,7 @@ export async function filterExpenseService(
   const [filteredExpenses, total] = await Promise.all([
     prisma.expense.findMany({
       where: where,
+      orderBy: { [filters.sortBy]: filters.sortOrder },
       skip: (filters.page - 1) * filters.limit,
       take: filters.limit,
     }),
@@ -178,8 +179,8 @@ export async function filterExpenseService(
     }),
   ]);
 
-  const pages: PaginatedExpenses = {
-    expenses: filteredExpenses,
+  const pages: PaginatedResponse<Expense> = {
+    data: filteredExpenses,
     limit: filters.limit,
     total: total,
     page: filters.page,

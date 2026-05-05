@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { filterExpenseSchema } from '../validators/expenseValidator';
+import { filterExpenseSchema } from '@expense-app/types';
 import {
   getAllExpensesService,
   getExpenseService,
@@ -9,9 +9,9 @@ import {
   filterExpenseService,
 } from '../services/expenseService';
 import {
-  createExpenseValidationSchema,
-  updateExpenseValidationSchema,
-} from '../validators/expenseValidator';
+  createExpenseBackendSchema,
+  updateExpenseBackendSchema,
+} from '@expense-app/types';
 
 export async function getAllExpensesController(
   req: Request,
@@ -19,7 +19,7 @@ export async function getAllExpensesController(
 ): Promise<void> {
   try {
     const expenses = await getAllExpensesService(req.user!.userId);
-    res.status(200).json({ expenses: expenses });
+    res.status(200).json(expenses);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -38,7 +38,7 @@ export async function getExpenseController(
       req.user!.userId,
       req.params.id as string
     );
-    res.status(200).json({ expense: expense });
+    res.status(200).json(expense);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -52,7 +52,7 @@ export async function createExpenseController(
   req: Request,
   res: Response
 ): Promise<void> {
-  const body = createExpenseValidationSchema.safeParse(req.body);
+  const body = createExpenseBackendSchema.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ message: body.error });
     return;
@@ -60,7 +60,7 @@ export async function createExpenseController(
 
   try {
     const expense = await createExpenseService(req.user!.userId, body.data);
-    res.status(201).json({ expense: expense });
+    res.status(201).json(expense);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -74,7 +74,7 @@ export async function updateExpenseController(
   req: Request,
   res: Response
 ): Promise<void> {
-  const body = updateExpenseValidationSchema.safeParse(req.body);
+  const body = updateExpenseBackendSchema.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ message: body.error });
     return;
@@ -86,7 +86,7 @@ export async function updateExpenseController(
       req.params.id as string,
       body.data
     );
-    res.status(200).json({ expense: expense });
+    res.status(200).json(expense);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -105,7 +105,7 @@ export async function deleteExpenseController(
       req.user!.userId,
       req.params.id as string
     );
-    res.status(200).json({ expenses: expenses });
+    res.status(200).json(expenses);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });

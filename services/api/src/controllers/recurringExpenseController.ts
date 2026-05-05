@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import {
-  createRecurringExpenseSchema,
-  updateRecurringExpenseSchema,
-} from '../validators/recurringExpenseValidator';
+  createRecurringExpenseBackendSchema,
+  updateRecurringExpenseBackendSchema,
+} from '@expense-app/types';
 import {
   getRecurringExpenseService,
   getAllRecurringExpenseService,
@@ -52,7 +52,7 @@ export async function createRecurringExpenseController(
   req: Request,
   res: Response
 ): Promise<void> {
-  const data = createRecurringExpenseSchema.safeParse(req.body);
+  const data = createRecurringExpenseBackendSchema.safeParse(req.body);
   if (!data.success) {
     res.status(400).json({ message: data.error });
     return;
@@ -76,7 +76,7 @@ export async function updateRecurringExpenseController(
   req: Request,
   res: Response
 ): Promise<void> {
-  const data = updateRecurringExpenseSchema.safeParse(req.body);
+  const data = updateRecurringExpenseBackendSchema.safeParse(req.body);
   if (!data.success) {
     res.status(400).json({ message: data.error });
     return;

@@ -15,7 +15,7 @@
     "sourceMap": true   ,
     "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": ["src", "src/config/env.ts"],
+  "include": ["src", "src/config/env.ts", "prisma/seed.ts"],
   "files": ["src/types/express.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

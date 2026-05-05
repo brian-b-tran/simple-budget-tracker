@@ -1,9 +1,9 @@
 import prisma from '../config/db';
 import { Budget, Prisma } from '../../generated/prisma/client';
 import {
-  CreateBudgetInput,
-  UpdateBudgetInput,
-} from '../validators/budgetValidator';
+  CreateBudgetBackendInput,
+  UpdateBudgetBackendInput,
+} from '@expense-app/types';
 import type { BudgetSummary, BudgetCategoryBreakdown } from '../types/budget';
 
 export async function getBudgetService(
@@ -45,7 +45,6 @@ export async function getBudgetService(
   //combine group by category amounts spent with categories to create BudgetCategoryBreakdowns
   const categoryBreakdownArray = CategoryGroups.map(
     (group): BudgetCategoryBreakdown => {
-      //match category ids to find category name
       const category = categories.find(
         (category) => category.id === group.categoryId
       );
@@ -69,7 +68,7 @@ export async function getBudgetService(
   );
 
   return {
-    budget: budget,
+    ...budget,
     totalSpent: totalSpent.toNumber(),
     remaining: remaining.toNumber(),
     percentageUsed: percentage.toNumber(),
@@ -84,9 +83,52 @@ export async function getAllBudgetsService(
   return budgets;
 }
 
+export async function getAllBudgetSummariesService(
+  userId: string
+): Promise<Array<BudgetSummary>> {
+  const [budgets, expensesGroupedByBudget] = await Promise.all([
+    //total spent for all expenses
+    prisma.budget.findMany({ where: { userId: userId } }),
+    prisma.expense.groupBy({
+      by: ['budgetId'],
+      where: { userId: userId },
+      _sum: { amountBase: true },
+    }),
+  ]);
+
+  const budgetSummaryArray = budgets.map((budget): BudgetSummary => {
+    const groupedExpenses = expensesGroupedByBudget.find(
+      (group) => group.budgetId === budget.id
+    );
+    if (!groupedExpenses) {
+      return {
+        ...budget,
+        totalSpent: 0,
+        remaining: budget.totalAmount.toNumber(),
+        percentageUsed: 0,
+        categoryBreakdown: [],
+      };
+    }
+
+    const totalSpent = groupedExpenses._sum.amountBase ?? new Prisma.Decimal(0);
+    const remaining = budget.totalAmount.sub(totalSpent);
+    const percentage = totalSpent.div(budget.totalAmount).times(100);
+
+    return {
+      ...budget,
+      totalSpent: totalSpent.toNumber(),
+      remaining: remaining.toNumber(),
+      percentageUsed: percentage.toNumber(),
+      categoryBreakdown: [],
+    };
+  });
+
+  return budgetSummaryArray;
+}
+
 export async function createBudgetService(
   userId: string,
-  budgetData: CreateBudgetInput
+  budgetData: CreateBudgetBackendInput
 ): Promise<Budget> {
   if (
     budgetData.type === 'VACATION' &&
@@ -130,7 +172,7 @@ export async function createBudgetService(
 export async function updateBudgetService(
   userId: string,
   budgetId: string,
-  budgetData: UpdateBudgetInput
+  budgetData: UpdateBudgetBackendInput
 ): Promise<Budget> {
   const oldBudget = await prisma.budget.findUnique({
     where: { id: budgetId, userId: userId },

@@ -1,9 +1,9 @@
 import prisma from '../config/db';
 import type { Reminder } from '../../generated/prisma/client';
 import type {
-  CreateReminderInput,
-  UpdateReminderInput,
-} from '../validators/reminderValidator';
+  CreateReminderBackendInput,
+  UpdateReminderBackendInput,
+} from '@expense-app/types';
 
 export async function getReminderService(
   userId: string,
@@ -32,7 +32,7 @@ export async function getAllRemindersService(
 
 export async function createReminderService(
   userId: string,
-  data: CreateReminderInput
+  data: CreateReminderBackendInput
 ): Promise<Reminder> {
   const newReminder = await prisma.reminder.create({
     data: {
@@ -52,7 +52,7 @@ export async function createReminderService(
 export async function updateReminderService(
   userId: string,
   id: string,
-  data: UpdateReminderInput
+  data: UpdateReminderBackendInput
 ): Promise<Reminder> {
   if (
     !(await prisma.reminder.findUnique({

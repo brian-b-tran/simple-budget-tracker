@@ -2,14 +2,15 @@ import { Request, Response } from 'express';
 import {
   getBudgetService,
   getAllBudgetsService,
+  getAllBudgetSummariesService,
   createBudgetService,
   updateBudgetService,
   deleteBudgetService,
 } from '../services/budgetService';
 import {
-  createBudgetSchema,
-  updateBudgetSchema,
-} from '../validators/budgetValidator';
+  createBudgetBackendSchema,
+  updateBudgetBackendSchema,
+} from '@expense-app/types';
 
 export async function getBudgetController(
   req: Request,
@@ -38,8 +39,8 @@ export async function getAllBudgetsController(
   res: Response
 ): Promise<void> {
   try {
-    const allBudgets = await getAllBudgetsService(req.user!.userId);
-    res.status(200).json({ budgets: allBudgets });
+    const allBudgets = await getAllBudgetSummariesService(req.user!.userId);
+    res.status(200).json(allBudgets);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -56,7 +57,7 @@ export async function createBudgetController(
   res: Response
 ): Promise<void> {
   try {
-    const budgetData = createBudgetSchema.safeParse(req.body);
+    const budgetData = createBudgetBackendSchema.safeParse(req.body);
     if (!budgetData.success) {
       res.status(400).json({ message: budgetData.error });
       return;
@@ -66,7 +67,7 @@ export async function createBudgetController(
       budgetData.data
     );
 
-    res.status(201).json({ newBudget: newBudget });
+    res.status(201).json(newBudget);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -83,7 +84,8 @@ export async function updateBudgetController(
   res: Response
 ): Promise<void> {
   try {
-    const budgetData = updateBudgetSchema.safeParse(req.body);
+    const budgetData = updateBudgetBackendSchema.safeParse(req.body);
+    console.log('Backend All Budgets Endpoint Service hit.');
     if (!budgetData.success) {
       res.status(400).json({ message: budgetData.error });
       return;
@@ -94,7 +96,7 @@ export async function updateBudgetController(
       budgetData.data
     );
 
-    res.status(200).json({ updatedBudget: updatedBudget });
+    res.status(200).json(updatedBudget);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
