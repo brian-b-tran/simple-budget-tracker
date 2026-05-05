@@ -17,6 +17,8 @@ export const expenseBaseSchema = z.object({
 export const filterExpenseSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
+  range: z.enum(['today', 'week', 'month', 'year']).optional(),
+  timeZone: z.string().optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
   categoryId: z.uuid().optional(),
