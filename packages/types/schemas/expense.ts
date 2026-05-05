@@ -24,10 +24,14 @@ export const filterExpenseSchema = z.object({
   type: z.enum(['EXPENSE', 'INCOME']).optional(),
   minAmount: z.coerce.number().optional(),
   maxAmount: z.coerce.number().optional(),
+  sortBy: z.enum(['date', 'amount', 'createdAt']).optional().default('date'),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
 });
 
 export const createExpenseFrontendSchema = expenseBaseSchema;
 export const createExpenseBackendSchema = expenseBaseSchema.extend({
+  date: z.coerce.date(),
+  time: z.coerce.date(),
   amountBase: z.number().optional(),
   exchangeRateUsed: z.number().optional(),
 });

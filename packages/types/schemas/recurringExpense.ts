@@ -16,7 +16,12 @@ export const recurringExpenseBaseSchema = z.object({
 });
 
 export const createRecurringExpenseFrontendSchema = recurringExpenseBaseSchema;
-export const createRecurringExpenseBackendSchema = recurringExpenseBaseSchema;
+
+export const createRecurringExpenseBackendSchema =
+  recurringExpenseBaseSchema.extend({
+    startDate: z.coerce.date(),
+    endDate: z.coerce.date().optional(),
+  });
 
 export const updateRecurringExpenseFrontendSchema =
   createRecurringExpenseBackendSchema.partial();
