@@ -1,6 +1,11 @@
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
-  const dateFormatted = new Intl.DateTimeFormat('en-US').format(date);
+  const dateFormatted = date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
   return dateFormatted;
 }
 

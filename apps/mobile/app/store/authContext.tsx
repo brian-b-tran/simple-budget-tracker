@@ -55,6 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const newToken = await refreshAccessService();
       await SecureStore.setItemAsync('accessToken', newToken.access);
+      accessTokenRef.current = newToken.access;
       setAccessToken(newToken.access);
     } catch (error) {
       console.error('Refresh Failed.');

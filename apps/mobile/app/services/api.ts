@@ -12,6 +12,7 @@ export function setupInterceptors(
   getToken: () => string | null,
   refresh: () => Promise<void>
 ) {
+  console.log('Setting up interceptors');
   //attach access token
   api.interceptors.request.use((config) => {
     const token = getToken();
@@ -26,16 +27,19 @@ export function setupInterceptors(
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
-      console.log('Intercepted an error', error.response.status);
+      console.log('Response interceptor hit', error?.response?.status);
+      console.log('_retry:', error.config?._retry);
       if (error.response.status === 401 && !originalRequest._retry) {
-        console.log('Retrying request..');
+        console.log('Attempting refresh...');
         originalRequest._retry = true;
         try {
           await refresh();
+          console.log('Refresh succeeded');
           const token = getToken();
           originalRequest.headers['Authorization'] = `Bearer ${token}`;
           return api(originalRequest);
         } catch {
+          console.log('Refresh failed, emitting sessionExpired');
           authEvents.emit();
           throw error;
         }

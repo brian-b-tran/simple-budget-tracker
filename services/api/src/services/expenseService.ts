@@ -170,6 +170,7 @@ export async function filterExpenseService(
   const [filteredExpenses, total] = await Promise.all([
     prisma.expense.findMany({
       where: where,
+      orderBy: { [filters.sortBy]: filters.sortOrder },
       skip: (filters.page - 1) * filters.limit,
       take: filters.limit,
     }),
