@@ -6,7 +6,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { useAuth } from '../store/authContext';
 import { ActivityIndicator, View } from 'react-native';
 import ExpenseDetailScreen from '../screens/ExpenseDetailScreen';
-const Stack = createNativeStackNavigator();
+import { RootStackParamList } from '../types/navigationTypes';
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootStack() {
   const { accessToken, isLoading, login, logout, register } = useAuth();
