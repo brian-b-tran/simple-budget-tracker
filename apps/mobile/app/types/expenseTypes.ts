@@ -16,6 +16,8 @@ export interface Expense {
   type: 'EXPENSE' | 'INCOME';
   createdAt: string;
   updatedAt: string;
+  category?: { name: string };
+  budget?: { name: string };
 }
 
 export interface ExpenseTotals {

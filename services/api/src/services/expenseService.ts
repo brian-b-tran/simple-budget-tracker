@@ -31,6 +31,10 @@ export async function getExpenseService(
       userId: userId,
       id: expenseId,
     },
+    include: {
+      category: { select: { name: true } },
+      budget: { select: { name: true } },
+    },
   });
   if (!expense) {
     throw new Error('Could not find this expense.');
@@ -194,6 +198,10 @@ export async function filterExpenseService(
       orderBy: [{ [filters.sortBy]: filters.sortOrder }, { id: 'desc' }],
       skip: (filters.page - 1) * filters.limit,
       take: filters.limit,
+      include: {
+        category: { select: { name: true } },
+        budget: { select: { name: true } },
+      },
     }),
     prisma.expense.count({
       where: where,

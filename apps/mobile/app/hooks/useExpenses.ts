@@ -42,7 +42,7 @@ export function useExpenses() {
   const loadMoreExpenses = async () => {
     try {
       setErrorState(null);
-      console.log('more expenses');
+      console.log('Loading more expenses.');
       if (!hasMore) return;
 
       const nextPage = filters.page + 1;
@@ -62,9 +62,6 @@ export function useExpenses() {
       }
 
       setFilters((prev) => ({ ...prev, page: nextPage }));
-      for (let i = 0; i < expenses.data.length; i++) {
-        console.log(expenses.data[i].id);
-      }
       console.log(`Items Loaded: PaginatedExpenses: ${expenses.data.length}`);
       setRecentExpenses((prev) => ({
         ...expenses,

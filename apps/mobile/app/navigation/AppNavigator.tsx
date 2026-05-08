@@ -5,6 +5,7 @@ import MainTabs from './MainTabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { useAuth } from '../store/authContext';
 import { ActivityIndicator, View } from 'react-native';
+import ExpenseDetailScreen from '../screens/ExpenseDetailScreen';
 const Stack = createNativeStackNavigator();
 
 export function RootStack() {
@@ -20,9 +21,14 @@ export function RootStack() {
     <NavigationContainer>
       <Stack.Navigator>
         {accessToken ? (
-          <Stack.Screen name='Main' options={{ headerShown: false }}>
-            {() => <MainTabs onLogout={logout} />}
-          </Stack.Screen>
+          <>
+            <Stack.Screen name='Main' options={{ headerShown: false }}>
+              {() => <MainTabs onLogout={logout} />}
+            </Stack.Screen>
+            <Stack.Screen name='ExpenseDetail' options={{ title: 'Expense' }}>
+              {() => <ExpenseDetailScreen />}
+            </Stack.Screen>
+          </>
         ) : (
           <Stack.Screen name='Auth' options={{ headerShown: false }}>
             {() => <AuthStack onLogin={login} onRegister={register} />}
