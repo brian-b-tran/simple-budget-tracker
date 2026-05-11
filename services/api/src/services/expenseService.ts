@@ -1,5 +1,5 @@
 import prisma from '../config/db';
-import { Expense } from '../../generated/prisma/client';
+import { Expense, Prisma } from '../../generated/prisma/client';
 
 import type {
   UpdateExpenseBackendInput,
@@ -34,6 +34,7 @@ export async function getExpenseService(
     include: {
       category: { select: { name: true } },
       budget: { select: { name: true } },
+      recurringExpense: { select: { frequency: true, interval: true } },
     },
   });
   if (!expense) {
@@ -201,6 +202,7 @@ export async function filterExpenseService(
       include: {
         category: { select: { name: true } },
         budget: { select: { name: true } },
+        recurringExpense: { select: { frequency: true, interval: true } },
       },
     }),
     prisma.expense.count({
@@ -229,15 +231,29 @@ export async function getExpenseTotalsService(
     ranges.map(async (range) => {
       const { start, end } = getDateRange(range, timeZone);
 
-      const res = await prisma.expense.aggregate({
+      const res = await prisma.expense.groupBy({
+        by: ['type'],
         where: {
           userId,
           date: { gte: start, lte: end },
         },
-        _sum: { amountOriginal: true },
+        _sum: { amountBase: true },
       });
-
-      return [range, Number(res._sum.amountOriginal ?? 0)] as const;
+      const income =
+        res.find((x) => x.type === 'INCOME')?._sum.amountBase ??
+        new Prisma.Decimal(0);
+      const expense =
+        res.find((x) => x.type === 'EXPENSE')?._sum.amountBase ??
+        new Prisma.Decimal(0);
+      const net = income.sub(expense);
+      return [
+        range,
+        {
+          income: income.toNumber(),
+          expense: expense.toNumber(),
+          net: net.toNumber(),
+        },
+      ] as const;
     })
   );
 

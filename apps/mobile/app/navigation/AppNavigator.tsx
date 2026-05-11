@@ -26,7 +26,7 @@ export function RootStack() {
             <Stack.Screen name='Main' options={{ headerShown: false }}>
               {() => <MainTabs onLogout={logout} />}
             </Stack.Screen>
-            <Stack.Screen name='ExpenseDetail' options={{ title: 'Expense' }}>
+            <Stack.Screen name='ExpenseDetail' options={{ title: 'Details' }}>
               {() => <ExpenseDetailScreen />}
             </Stack.Screen>
           </>

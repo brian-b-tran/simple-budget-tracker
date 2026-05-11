@@ -47,11 +47,12 @@ export default function BudgetCard({ budget }: BudgetCardProps) {
       <CardContent>
         <SimpleProgress value={budget.percentageUsed} />
         <Text>
-          Spent: ${budget.totalSpent} of ${budget.totalAmount}
+          Spent: ${budget.totalSpent.toFixed(2)} of $
+          {budget.totalAmount.toFixed(2)}
         </Text>
       </CardContent>
       <CardFooter>
-        <Text>Remaining: ${budget.remaining}</Text>
+        <Text>Remaining: ${budget.remaining.toFixed(2)}</Text>
       </CardFooter>
     </Card>
   );

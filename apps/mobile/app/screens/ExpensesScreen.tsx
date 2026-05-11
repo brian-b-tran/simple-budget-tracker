@@ -45,7 +45,7 @@ export default function ExpensesScreen() {
       return cycleOrder[nextIndex];
     });
   }
-  const displayedTotal = expenseTotals?.[selected] ?? 0;
+  const displayedTotal = expenseTotals?.[selected].net ?? 0;
 
   if (listLoading || totalsLoading) {
     return (
@@ -85,7 +85,8 @@ export default function ExpensesScreen() {
         {/* Greeting */}
         <View className='mb-6 ml-6 mr-6'>
           <Text className='text-3xl font-bold text-slate-800'>
-            ${displayedTotal.toFixed(2)}
+            {displayedTotal >= 0 ? '+' : '-'}$
+            {Math.abs(displayedTotal).toFixed(2)}
           </Text>
 
           <Text>Showing: {selected}</Text>

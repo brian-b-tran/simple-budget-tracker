@@ -20,13 +20,13 @@ export async function getBudgetService(
   const [expenseSumAggregate, CategoryGroups] = await Promise.all([
     //total spent for all expenses
     prisma.expense.aggregate({
-      where: { userId: userId, budgetId: budget.id },
+      where: { userId: userId, budgetId: budget.id, type: 'EXPENSE' },
       _sum: { amountBase: true },
     }),
     //total spent grouped by category
     prisma.expense.groupBy({
       by: ['categoryId'],
-      where: { budgetId: budgetId, userId: userId },
+      where: { budgetId: budgetId, userId: userId, type: 'EXPENSE' },
       _sum: { amountBase: true },
     }),
   ]);
@@ -91,7 +91,7 @@ export async function getAllBudgetSummariesService(
     prisma.budget.findMany({ where: { userId: userId } }),
     prisma.expense.groupBy({
       by: ['budgetId'],
-      where: { userId: userId },
+      where: { userId: userId, type: 'EXPENSE' },
       _sum: { amountBase: true },
     }),
   ]);
@@ -112,7 +112,9 @@ export async function getAllBudgetSummariesService(
 
     const totalSpent = groupedExpenses._sum.amountBase ?? new Prisma.Decimal(0);
     const remaining = budget.totalAmount.sub(totalSpent);
-    const percentage = totalSpent.div(budget.totalAmount).times(100);
+    const percentage = budget.totalAmount.equals(0)
+      ? new Prisma.Decimal(0)
+      : totalSpent.div(budget.totalAmount).times(100);
 
     return {
       ...budget,

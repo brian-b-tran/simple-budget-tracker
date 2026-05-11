@@ -9,7 +9,7 @@ export default function SimpleProgress({ value }: SimpleProgressProps) {
   return (
     <View className='w-full h-2 bg-slate-200 rounded-full overflow-hidden'>
       <View
-        className='h-full bg-blue-500 rounded-full'
+        className={`h-full ${clamped > 90 ? 'bg-red-400' : clamped > 90 ? 'bg-amber-400' : 'bg-blue-400'} rounded-full`}
         style={{ width: `${clamped}%` }}
       />
     </View>

@@ -22,7 +22,13 @@ export default function ExpenseRow({ expense }: ExpenseRowProps) {
       <Card className='mb-1 mt-1'>
         <CardHeader>
           <View className='flex-row justify-between items-center'>
-            <CardTitle>${expense.amountOriginal}</CardTitle>
+            <CardTitle>
+              {expense.type === 'EXPENSE' ? '-' : '+'}
+              {new Intl.NumberFormat('en-CA', {
+                style: 'currency',
+                currency: expense.currencyOriginal,
+              }).format(expense.amountOriginal)}
+            </CardTitle>
             <Text>{expense.currencyOriginal}</Text>
           </View>
           <CardDescription>

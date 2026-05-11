@@ -1,4 +1,6 @@
 import { PaginatedResponse } from '@expense-app/types';
+import { RecurringExpense } from './recurringExpense';
+import { Frequency } from '../../../../services/api/generated/prisma/enums';
 
 export interface Expense {
   id: string;
@@ -18,12 +20,13 @@ export interface Expense {
   updatedAt: string;
   category?: { name: string };
   budget?: { name: string };
+  recurringExpense?: { frequency: string; interval: number };
 }
 
 export interface ExpenseTotals {
-  today: number;
-  week: number;
-  month: number;
-  year: number;
+  today: { income: number; expense: number; net: number };
+  week: { income: number; expense: number; net: number };
+  month: { income: number; expense: number; net: number };
+  year: { income: number; expense: number; net: number };
 }
 export type PaginatedExpense = PaginatedResponse<Expense>;

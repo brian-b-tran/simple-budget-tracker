@@ -29,9 +29,8 @@ config.resolver.extraNodeModules = {
 };
 config.resolver.disableHierarchicalLookup = true;
 
-const reanimatedConfig = wrapWithReanimatedMetroConfig(config);
-
-module.exports = withNativeWind(reanimatedConfig, {
+const nativeWindConfig = withNativeWind(config, {
   input: './global.css',
   inlineRem: 16,
 });
+module.exports = wrapWithReanimatedMetroConfig(nativeWindConfig);
