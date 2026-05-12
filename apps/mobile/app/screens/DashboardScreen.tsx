@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import ExpenseRow from '@/app/components/expense/ExpenseRow';
 import { Expense } from '../types/expenseTypes';
 import { Reminder } from '../types/reminderTypes';
 import ReminderRow from '../components/reminder/reminderRow';
+import { useFocusEffect } from '@react-navigation/native';
 export default function DashboardScreen() {
   const {
     activeBudgets,
@@ -29,6 +30,12 @@ export default function DashboardScreen() {
     await refreshDash();
     setRefreshing(false);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshDash();
+    }, [refreshDash])
+  );
 
   if (isLoading) {
     return (

@@ -70,7 +70,15 @@ export async function createExpense(
   input: CreateExpenseFrontendInput
 ): Promise<Expense> {
   try {
-    const { data } = await api.post<Expense>(`/expenses`, input);
+    const cleanedInput = {
+      ...input,
+      amountOriginal: parseFloat(input.amountOriginal),
+      budgetId: input.budgetId || undefined,
+      recurringExpenseId: input.recurringExpenseId || undefined,
+      notes: input.notes || undefined,
+    };
+
+    const { data } = await api.post<Expense>(`/expenses`, cleanedInput);
 
     return data;
   } catch (error: any) {

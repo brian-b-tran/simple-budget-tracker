@@ -1,9 +1,6 @@
 import { z } from 'zod';
 
 export const recurringExpenseBaseSchema = z.object({
-  amountOriginal: z
-    .number()
-    .refine((val) => val !== 0, { message: 'Amount cannot be zero' }),
   currencyOriginal: z.string().length(3).optional(),
   categoryId: z.uuid(),
   frequency: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']),
@@ -15,16 +12,28 @@ export const recurringExpenseBaseSchema = z.object({
   type: z.enum(['EXPENSE', 'INCOME']),
 });
 
-export const createRecurringExpenseFrontendSchema = recurringExpenseBaseSchema;
+export const createRecurringExpenseFrontendSchema =
+  recurringExpenseBaseSchema.extend({
+    amountOriginal: z
+      .string()
+      .min(1, 'Amount is required')
+      .refine((val) => {
+        const parsed = parseFloat(val);
+        return !isNaN(parsed) && parsed !== 0;
+      }),
+  });
 
 export const createRecurringExpenseBackendSchema =
   recurringExpenseBaseSchema.extend({
+    amountOriginal: z
+      .number()
+      .refine((val) => val !== 0, { message: 'Amount cannot be zero' }),
     startDate: z.coerce.date(),
     endDate: z.coerce.date().optional(),
   });
 
 export const updateRecurringExpenseFrontendSchema =
-  createRecurringExpenseBackendSchema.partial();
+  createRecurringExpenseFrontendSchema.partial();
 export const updateRecurringExpenseBackendSchema =
   createRecurringExpenseBackendSchema.partial();
 

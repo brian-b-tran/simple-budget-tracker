@@ -1,9 +1,6 @@
 import { z } from 'zod';
 
 export const expenseBaseSchema = z.object({
-  amountOriginal: z
-    .number()
-    .refine((val) => val !== 0, { message: 'Amount cannot be zero' }),
   categoryId: z.uuid().min(1),
   date: z.date(),
   time: z.date(),
@@ -30,8 +27,20 @@ export const filterExpenseSchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
 });
 
-export const createExpenseFrontendSchema = expenseBaseSchema;
+export const createExpenseFrontendSchema = expenseBaseSchema.extend({
+  amountOriginal: z
+    .string()
+    .min(1, 'Amount is required')
+    .refine((val) => {
+      const parsed = parseFloat(val);
+      return !isNaN(parsed) && parsed !== 0;
+    }),
+});
+
 export const createExpenseBackendSchema = expenseBaseSchema.extend({
+  amountOriginal: z
+    .number()
+    .refine((val) => val !== 0, { message: 'Amount cannot be zero' }),
   date: z.coerce.date(),
   time: z.coerce.date(),
   amountBase: z.number().optional(),
@@ -39,7 +48,8 @@ export const createExpenseBackendSchema = expenseBaseSchema.extend({
 });
 
 export const updateExpenseBackendSchema = createExpenseBackendSchema.partial();
-export const updateExpenseFrontendSchema = expenseBaseSchema.partial();
+export const updateExpenseFrontendSchema =
+  createExpenseFrontendSchema.partial();
 
 export type CreateExpenseFrontendInput = z.infer<
   typeof createExpenseFrontendSchema

@@ -7,9 +7,16 @@ export async function createRecurringExpense(
   input: CreateRecurringExpenseFrontendInput
 ): Promise<RecurringExpense> {
   try {
+    const cleanedInput = {
+      ...input,
+      amountOriginal: parseFloat(input.amountOriginal),
+      budgetId: input.budgetId || undefined,
+      endDate: input.endDate || undefined,
+      notes: input.notes || undefined,
+    };
     const { data } = await api.post<RecurringExpense>(
       `/recurring-expenses`,
-      input
+      cleanedInput
     );
     return data;
   } catch (error: any) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useExpenses } from '../hooks/useExpenses';
 import ExpenseRow from '../components/expense/ExpenseRow';
 import { Expense } from '../types/expenseTypes';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function ExpensesScreen() {
   const {
@@ -27,7 +28,7 @@ export default function ExpensesScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [selected, setSelected] = useState<CycleKey>('today');
 
-  const onRefresh = React.useCallback(async () => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await refreshExpenses();
     await refreshTotal();
@@ -38,14 +39,21 @@ export default function ExpensesScreen() {
 
   type CycleKey = (typeof cycleOrder)[number];
 
-  function cycleTotals() {
+  const cycleTotals = () => {
     setSelected((prev) => {
       const index = cycleOrder.indexOf(prev);
       const nextIndex = (index + 1) % cycleOrder.length;
       return cycleOrder[nextIndex];
     });
-  }
+  };
+
   const displayedTotal = expenseTotals?.[selected].net ?? 0;
+  useFocusEffect(
+    useCallback(() => {
+      refreshExpenses();
+      refreshTotal();
+    }, [refreshExpenses, refreshTotal])
+  );
 
   if (listLoading || totalsLoading) {
     return (
@@ -54,6 +62,7 @@ export default function ExpensesScreen() {
       </SafeAreaView>
     );
   }
+
   if (errorState) {
     return (
       <SafeAreaView className='flex-1'>

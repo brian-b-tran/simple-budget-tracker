@@ -99,15 +99,8 @@ export default function AddExpenseModal({
   const onSubmitExpense = async (data: CreateExpenseFrontendInput) => {
     setApiError(false);
     try {
-      const cleanedData = {
-        ...data,
-        budgetId: data.budgetId === '' ? undefined : data.budgetId,
-        recurringExpenseId:
-          data.recurringExpenseId === '' ? undefined : data.recurringExpenseId,
-        notes: data.notes === '' ? undefined : data.notes,
-      };
-      console.log(cleanedData);
-      await createExpense(cleanedData);
+      console.log(data);
+      await createExpense(data);
       expenseForm.reset({ type: 'EXPENSE', currencyOriginal: 'CAD' });
       handleClose();
     } catch (error: any) {
@@ -121,14 +114,8 @@ export default function AddExpenseModal({
   ) => {
     setApiError(false);
     try {
-      const cleanedData = {
-        ...data,
-        budgetId: data.budgetId === '' ? undefined : data.budgetId,
-        endDate: data.endDate === undefined ? undefined : data.endDate,
-        notes: data.notes === '' ? undefined : data.notes,
-      };
-      console.log(cleanedData);
-      await createRecurringExpense(cleanedData);
+      console.log(data);
+      await createRecurringExpense(data);
       recurringForm.reset({
         type: 'EXPENSE',
         currencyOriginal: 'CAD',
@@ -224,14 +211,13 @@ export default function AddExpenseModal({
                 className={`bg-white border p-4 rounded-xl text-slate-900 ${errors.amountOriginal ? 'border-red-500' : 'border-slate-200'}`}
                 onBlur={onBlur}
                 onChangeText={(text) => {
-                  if (text === '' || text === '-') {
-                    onChange(undefined);
-                    return;
+                  const decimalRegex = /^\d*\.?\d*$/;
+
+                  if (decimalRegex.test(text)) {
+                    onChange(text);
                   }
-                  const parsed = parseFloat(text);
-                  onChange(isNaN(parsed) ? undefined : parsed);
                 }}
-                value={value !== undefined ? value.toString() : ''}
+                value={value ?? ''}
                 placeholder='0.00'
                 keyboardType='decimal-pad'
               />
