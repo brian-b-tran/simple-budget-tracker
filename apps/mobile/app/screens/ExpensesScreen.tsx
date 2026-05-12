@@ -82,27 +82,25 @@ export default function ExpensesScreen() {
         className='flex-1'
         contentContainerStyle={{ padding: 4 }}
       >
-        {/* Greeting */}
-        <View className='mb-6 ml-6 mr-6'>
-          <Text className='text-3xl font-bold text-slate-800'>
-            {displayedTotal >= 0 ? '+' : '-'}$
-            {Math.abs(displayedTotal).toFixed(2)}
-          </Text>
-
-          <Text>Showing: {selected}</Text>
-
-          {/* Cycle button */}
-          <TouchableOpacity onPress={cycleTotals}>
-            <Text>Cycle</Text>
-          </TouchableOpacity>
-        </View>
-
+        {/* totals by day, week, month, year  */}
+        <TouchableOpacity
+          onPress={cycleTotals}
+          className='mb-6 ml-2 mr-2 flex center items-center bg-white rounded-xl solid p-8 shadow'
+        >
+          <View className='items-center'>
+            <Text className='text-4xl font-bold text-slate-800'>
+              {displayedTotal >= 0 ? '+' : '-'}$
+              {Math.abs(displayedTotal).toFixed(2)}
+            </Text>
+            <Text>{selected === 'today' ? 'Today ' : `This ${selected} `}</Text>
+          </View>
+        </TouchableOpacity>
         {/* Recent Expenses */}
         {recentExpenses && recentExpenses.data.length > 0 ? (
-          <View>
-            <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+          <View className='mr-2 ml-2 mb-6'>
+            {/* <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
               Recent Expenses
-            </Text>
+            </Text> */}
             {recentExpenses.data.map((expense: Expense) => (
               <ExpenseRow key={expense.id} expense={expense} />
             ))}
@@ -110,7 +108,7 @@ export default function ExpensesScreen() {
             <TouchableOpacity
               onPress={loadMoreExpenses}
               disabled={!hasMore}
-              className={`h-14 rounded-xl items-center justify-center ${!hasMore ? 'hidden' : 'bg-slate-400'}`}
+              className={`h-14 rounded-xl items-center justify-center mt-4 ${!hasMore ? 'hidden' : 'bg-slate-400'}`}
             >
               <Text className='text-white-400 text-xl'>Load More</Text>
             </TouchableOpacity>

@@ -139,7 +139,7 @@ export default function ExpenseDetailScreen() {
 
             {detailedExpense.budgetId && (
               <>
-                <Text className='text-2xl mt-4 mb-4'>
+                <Text className='text-2xl mt-4 mb-4 bg-cyan-100 rounded-xl text-center mt-2'>
                   {detailedExpense.budget?.name}
                 </Text>
               </>
