@@ -15,6 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDate, formatTime } from '../utils/dateUtils';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import EditExpenseModal from '../components/expense/EditExpenseModal';
 type ExpenseDetailRouteProp = RouteProp<RootStackParamList, 'ExpenseDetail'>;
 
 /**  
@@ -41,7 +42,8 @@ export default function ExpenseDetailScreen() {
   const [detailedExpense, setDetailedExpense] = useState<Expense>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorState, setErrorState] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
   const navigation = useNavigation<NavProp>();
   const loadExpense = async () => {
     setIsLoading(true);
@@ -86,6 +88,7 @@ export default function ExpenseDetailScreen() {
     );
   };
 
+  const handleEdit = (expense: Expense) => {};
   useEffect(() => {
     loadExpense();
   }, [expenseId]);
@@ -200,6 +203,12 @@ export default function ExpenseDetailScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <EditExpenseModal
+        visible={editModalOpen}
+        onClose={(): void => setEditModalOpen(false)}
+        expense={detailedExpense}
+      />
     </SafeAreaView>
   );
 }

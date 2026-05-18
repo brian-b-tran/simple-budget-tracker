@@ -91,7 +91,20 @@ export async function updateExpense(
   expenseId: string
 ): Promise<Expense> {
   try {
-    const { data } = await api.put<Expense>(`/expenses/${expenseId}`, input);
+    const cleanedInput = {
+      ...input,
+      amountOriginal: input.amountOriginal
+        ? parseFloat(input.amountOriginal)
+        : undefined,
+      budgetId: input.budgetId || undefined,
+      recurringExpenseId: input.recurringExpenseId || undefined,
+      notes: input.notes || undefined,
+    };
+
+    const { data } = await api.put<Expense>(
+      `/expenses/${expenseId}`,
+      cleanedInput
+    );
 
     return data;
   } catch (error: any) {

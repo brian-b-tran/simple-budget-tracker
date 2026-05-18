@@ -1,6 +1,4 @@
 import { PaginatedResponse } from '@expense-app/types';
-import { RecurringExpense } from './recurringExpense';
-import { Frequency } from '../../../../services/api/generated/prisma/enums';
 
 export interface Expense {
   id: string;
