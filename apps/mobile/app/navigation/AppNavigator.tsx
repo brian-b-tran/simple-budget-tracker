@@ -7,6 +7,7 @@ import { useAuth } from '../store/authContext';
 import { ActivityIndicator, View } from 'react-native';
 import ExpenseDetailScreen from '../screens/ExpenseDetailScreen';
 import { RootStackParamList } from '../types/navigationTypes';
+import RecurringExpenseDetailScreen from '../screens/RecurringExpenseDetailScreen';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootStack() {
@@ -28,6 +29,12 @@ export function RootStack() {
             </Stack.Screen>
             <Stack.Screen name='ExpenseDetail' options={{ title: 'Details' }}>
               {() => <ExpenseDetailScreen />}
+            </Stack.Screen>
+            <Stack.Screen
+              name='RecurringExpenseDetail'
+              options={{ title: 'Details' }}
+            >
+              {() => <RecurringExpenseDetailScreen />}
             </Stack.Screen>
           </>
         ) : (

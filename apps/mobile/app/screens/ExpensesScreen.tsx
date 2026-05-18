@@ -12,6 +12,9 @@ import { useExpenses } from '../hooks/useExpenses';
 import ExpenseRow from '../components/expense/ExpenseRow';
 import { Expense } from '../types/expenseTypes';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRecurringExpenses } from '../hooks/useRecurringExpenses';
+import { RecurringExpense } from '../types/recurringExpense';
+import RecurringExpenseRow from '../components/expense/RecurringExpenseRow';
 
 export default function ExpensesScreen() {
   const {
@@ -25,6 +28,16 @@ export default function ExpensesScreen() {
     errorState,
     hasMore,
   } = useExpenses();
+
+  const {
+    recurringExpenses,
+    loadMoreRecurring,
+    refreshRecurringExpenses,
+    listLoading: recurringListLoading,
+    errorState: recurringErrorState,
+    hasMoreRecurring,
+  } = useRecurringExpenses();
+
   const [refreshing, setRefreshing] = useState(false);
   const [selected, setSelected] = useState<CycleKey>('today');
 
@@ -32,6 +45,7 @@ export default function ExpensesScreen() {
     setRefreshing(true);
     await refreshExpenses();
     await refreshTotal();
+    await refreshRecurringExpenses();
     setRefreshing(false);
   }, []);
 
@@ -52,7 +66,8 @@ export default function ExpensesScreen() {
     useCallback(() => {
       refreshExpenses();
       refreshTotal();
-    }, [refreshExpenses, refreshTotal])
+      refreshRecurringExpenses();
+    }, [refreshExpenses, refreshTotal, refreshRecurringExpenses])
   );
 
   if (listLoading || totalsLoading) {
@@ -104,6 +119,7 @@ export default function ExpensesScreen() {
             <Text>{selected === 'today' ? 'Today ' : `This ${selected} `}</Text>
           </View>
         </TouchableOpacity>
+
         {/* Recent Expenses */}
         {recentExpenses && recentExpenses.data.length > 0 ? (
           <View className='mr-2 ml-2 mb-6'>
@@ -124,6 +140,30 @@ export default function ExpensesScreen() {
           </View>
         ) : (
           <Text className='text-slate-400 ml-6 mt-2'>No Expenses yet</Text>
+        )}
+
+        {/* Recurring Expenses */}
+        {recurringExpenses && recurringExpenses.data.length > 0 ? (
+          <View className='mr-2 ml-2 mb-6 mt-4'>
+            <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+              Recurring
+            </Text>
+            {recurringExpenses.data.map((expense: RecurringExpense) => (
+              <RecurringExpenseRow key={expense.id} expense={expense} />
+            ))}
+
+            <TouchableOpacity
+              onPress={loadMoreRecurring}
+              disabled={!hasMoreRecurring}
+              className={`h-14 rounded-xl items-center justify-center mt-4 ${!hasMoreRecurring ? 'hidden' : 'bg-slate-400'}`}
+            >
+              <Text className='text-white-400 text-xl'>Load More</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <Text className='text-slate-400 ml-6 mt-2'>
+            No Recurring Transactions yet
+          </Text>
         )}
       </ScrollView>
     </SafeAreaView>

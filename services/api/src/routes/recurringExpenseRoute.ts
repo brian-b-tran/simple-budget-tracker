@@ -5,12 +5,18 @@ import {
   createRecurringExpenseController,
   updateRecurringExpenseController,
   deleteRecurringExpenseController,
+  recurringFilterExpenseController,
 } from '../controllers/recurringExpenseController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
 const recurringRouter = Router();
 
 recurringRouter.get('/', authMiddleware, getAllRecurringExpenseController);
+recurringRouter.get(
+  '/filter',
+  authMiddleware,
+  recurringFilterExpenseController
+);
 recurringRouter.get('/:id', authMiddleware, getRecurringExpenseController);
 recurringRouter.post('/', authMiddleware, createRecurringExpenseController);
 recurringRouter.put('/:id', authMiddleware, updateRecurringExpenseController);

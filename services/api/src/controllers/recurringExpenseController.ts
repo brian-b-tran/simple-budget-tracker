@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import {
   createRecurringExpenseBackendSchema,
+  filterExpenseSchema,
   updateRecurringExpenseBackendSchema,
 } from '@expense-app/types';
 import {
@@ -9,6 +10,7 @@ import {
   createRecurringExpenseService,
   updateRecurringExpenseService,
   deleteRecurringExpenseService,
+  filterRecurringExpenseService,
 } from '../services/recurringExpenseService';
 
 export async function getRecurringExpenseController(
@@ -112,6 +114,31 @@ export async function deleteRecurringExpenseController(
       res.status(400).json({ message: error.message });
     } else {
       res.status(500).json({ message: 'Internal Service Error.' });
+    }
+  }
+}
+
+export async function recurringFilterExpenseController(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const filter = filterExpenseSchema.safeParse(req.query);
+  if (!filter.success) {
+    res.status(400).json({ message: 'Invalid filter parameters.' });
+    return;
+  }
+  try {
+    const filteredExpense = await filterRecurringExpenseService(
+      req.user!.userId,
+      filter.data
+    );
+    res.status(200).json(filteredExpense);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      res.status(400).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Internal server error' });
     }
   }
 }

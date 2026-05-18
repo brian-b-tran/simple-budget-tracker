@@ -2,9 +2,12 @@ import prisma from '../config/db';
 import { RecurringExpense } from '../../generated/prisma/client';
 import type {
   CreateRecurringExpenseBackendInput,
+  FilterExpenseInput,
+  PaginatedResponse,
   UpdateRecurringExpenseBackendInput,
 } from '@expense-app/types';
 import { getExchangeRateService } from './exchangeRateService';
+import { getDateRange } from '@expense-app/shared';
 
 export async function getRecurringExpenseService(
   userId: string,
@@ -12,6 +15,10 @@ export async function getRecurringExpenseService(
 ): Promise<RecurringExpense> {
   const recurringExpense = await prisma.recurringExpense.findUnique({
     where: { id: recurringId, userId: userId },
+    include: {
+      category: { select: { name: true } },
+      budget: { select: { name: true } },
+    },
   });
 
   if (!recurringExpense) {
@@ -26,6 +33,10 @@ export async function getAllRecurringExpenseService(
 ): Promise<Array<RecurringExpense>> {
   const allRecurringExpenses = await prisma.recurringExpense.findMany({
     where: { userId: userId },
+    include: {
+      category: { select: { name: true } },
+      budget: { select: { name: true } },
+    },
   });
 
   return allRecurringExpenses;
@@ -157,4 +168,76 @@ export async function deleteRecurringExpenseService(
   });
 
   return deleted;
+}
+
+export async function filterRecurringExpenseService(
+  userId: string,
+  filters: FilterExpenseInput
+): Promise<PaginatedResponse<RecurringExpense>> {
+  let dateFilter = {};
+
+  if (filters.range && filters.timeZone) {
+    const { start, end } = getDateRange(filters.range, filters.timeZone);
+
+    dateFilter = {
+      nextRunDate: {
+        gte: start,
+        lte: end,
+      },
+    };
+  } else if (filters.startDate && filters.endDate) {
+    dateFilter = {
+      nextRunDate: {
+        gte: filters.startDate,
+        lte: filters.endDate,
+      },
+    };
+  }
+
+  const where = {
+    userId: userId,
+    ...(filters.categoryId && { categoryId: filters.categoryId }),
+    ...(filters.type && { type: filters.type }),
+    ...(filters.budgetId && { budgetId: filters.budgetId }),
+    ...(filters.minAmount != null &&
+      filters.maxAmount != null && {
+        amountOriginal: {
+          gte: filters.minAmount,
+          lte: filters.maxAmount,
+        },
+      }),
+    ...dateFilter,
+  };
+  const order =
+    filters.sortBy === 'amount'
+      ? 'amountOriginal'
+      : filters.sortBy === 'date'
+        ? 'nextRunDate'
+        : 'createdAt';
+
+  const [filteredExpenses, total] = await Promise.all([
+    prisma.recurringExpense.findMany({
+      where: where,
+      orderBy: [{ [order]: filters.sortOrder }, { id: 'desc' }],
+      skip: (filters.page - 1) * filters.limit,
+      take: filters.limit,
+      include: {
+        category: { select: { name: true } },
+        budget: { select: { name: true } },
+      },
+    }),
+    prisma.recurringExpense.count({
+      where: where,
+    }),
+  ]);
+
+  const pages: PaginatedResponse<RecurringExpense> = {
+    data: filteredExpenses,
+    limit: filters.limit,
+    total: total,
+    page: filters.page,
+    totalPages: Math.ceil(total / filters.limit),
+  };
+
+  return pages;
 }
