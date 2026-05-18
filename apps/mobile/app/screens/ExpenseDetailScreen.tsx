@@ -45,6 +45,7 @@ export default function ExpenseDetailScreen() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
   const navigation = useNavigation<NavProp>();
+
   const loadExpense = async () => {
     setIsLoading(true);
     try {
@@ -88,7 +89,6 @@ export default function ExpenseDetailScreen() {
     );
   };
 
-  const handleEdit = (expense: Expense) => {};
   useEffect(() => {
     loadExpense();
   }, [expenseId]);
@@ -192,7 +192,10 @@ export default function ExpenseDetailScreen() {
         </View>
         {/*Edit and Delete */}
         <View className='p-4 flex-row gap-4 mt-6 relative bottom-0'>
-          <TouchableOpacity className='flex-1 h-14 rounded-xl items-center justify-center bg-slate-300'>
+          <TouchableOpacity
+            className='flex-1 h-14 rounded-xl items-center justify-center bg-slate-300'
+            onPress={() => setEditModalOpen(true)}
+          >
             <Text className='text-white font-bold'>Edit</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -206,7 +209,10 @@ export default function ExpenseDetailScreen() {
 
       <EditExpenseModal
         visible={editModalOpen}
-        onClose={(): void => setEditModalOpen(false)}
+        onClose={(): void => {
+          setEditModalOpen(false);
+          onRefresh();
+        }}
         expense={detailedExpense}
       />
     </SafeAreaView>

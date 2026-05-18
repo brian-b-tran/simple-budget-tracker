@@ -75,7 +75,16 @@ export default function EditExpenseModal({
   };
 
   const handleClose = () => {
-    expenseForm.reset({ type: 'EXPENSE', currencyOriginal: 'CAD' });
+    expenseForm.reset({
+      categoryId: expense.categoryId,
+      date: new Date(expense.date),
+      time: new Date(expense.time),
+      type: expense.type,
+      currencyOriginal: expense.currencyOriginal,
+      budgetId: expense.budgetId,
+      notes: expense.notes,
+      amountOriginal: expense.amountOriginal.toFixed(2),
+    });
     const date = new Date(expense.date);
     const time = new Date(expense.time);
     setSelectedDate(date);
@@ -308,18 +317,16 @@ export default function EditExpenseModal({
             >
               <ScrollView contentContainerStyle={{ flexGrow: 1 }} className=''>
                 {/*Expense Fields */}
-                <View className='p-6'>
+                <View className='p-4'>
                   {renderFields(
                     expenseForm.watch,
                     expenseForm.control,
                     expenseForm.formState.errors,
                     expenseForm.setValue
                   )}
-                </View>
 
-                {/*Date and Time pickers */}
+                  {/*Date and Time pickers */}
 
-                <View>
                   <View className='mb-4'>
                     <Text className='mb-2 pl-2 text-slate-600 font-medium'>
                       Date
@@ -377,12 +384,12 @@ export default function EditExpenseModal({
                     console.log('Expense errors:', JSON.stringify(errors))
                   )}
                   disabled={expenseForm.formState.isSubmitting}
-                  className={`h-14 rounded-xl items-center justify-center ${expenseForm.formState.isSubmitting ? 'bg-indigo-400' : 'bg-indigo-600'}`}
+                  className={`h-14 rounded-xl items-center justify-center ml-6 mr-6 mb-6 ${expenseForm.formState.isSubmitting ? 'bg-indigo-400' : 'bg-indigo-600'}`}
                 >
                   {expenseForm.formState.isSubmitting ? (
                     <ActivityIndicator color='white' />
                   ) : (
-                    <Text className='text-white font-bold text-lg'>Add</Text>
+                    <Text className='text-white font-bold text-lg'>save</Text>
                   )}
                 </TouchableOpacity>
 
