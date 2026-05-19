@@ -3,4 +3,5 @@ export type RootStackParamList = {
   Auth: undefined;
   ExpenseDetail: { expenseId: string };
   RecurringExpenseDetail: { recurringId: string };
+  BudgetDetail: { budgetId: string };
 };

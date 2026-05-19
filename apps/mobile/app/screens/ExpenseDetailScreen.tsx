@@ -16,7 +16,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDate, formatTime } from '../utils/dateUtils';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import EditExpenseModal from '../components/expense/EditExpenseModal';
-type ExpenseDetailRouteProp = RouteProp<RootStackParamList, 'ExpenseDetail'>;
 
 /**  
   id: string;
@@ -35,7 +34,9 @@ type ExpenseDetailRouteProp = RouteProp<RootStackParamList, 'ExpenseDetail'>;
   createdAt: string;
   updatedAt: string;
 */
+type ExpenseDetailRouteProp = RouteProp<RootStackParamList, 'ExpenseDetail'>;
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
+
 export default function ExpenseDetailScreen() {
   const route = useRoute<ExpenseDetailRouteProp>();
   const { expenseId } = route.params;
@@ -209,7 +210,8 @@ export default function ExpenseDetailScreen() {
 
       <EditExpenseModal
         visible={editModalOpen}
-        onClose={(): void => {
+        onClose={() => setEditModalOpen(false)}
+        onSuccess={() => {
           setEditModalOpen(false);
           onRefresh();
         }}

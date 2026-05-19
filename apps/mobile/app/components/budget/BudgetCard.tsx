@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { BudgetSummary } from '../../types/budgetTypes';
 import {
   Card,
@@ -10,6 +10,9 @@ import {
   CardTitle,
 } from '../ui/card';
 import SimpleProgress from '../ui/simpleProgress';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '@/app/types/navigationTypes';
 
 interface BudgetCardProps {
   budget: BudgetSummary;
@@ -32,28 +35,35 @@ interface BudgetCardProps {
     "remaining": 4000,
     "percentageUsed": 0,
     "categoryBreakdown": [] */
-
+type NavProp = NativeStackNavigationProp<RootStackParamList>;
 export default function BudgetCard({ budget }: BudgetCardProps) {
+  const navigation = useNavigation<NavProp>();
   return (
-    <Card className='mt-2'>
-      <CardHeader>
-        <View className='flex-row justify-between items-center'>
-          <CardTitle>{budget.name}</CardTitle>
-          <Text>{budget.type}</Text>
-        </View>
-        <CardDescription>{budget.currency}</CardDescription>
-      </CardHeader>
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate('BudgetDetail', { budgetId: budget.id })
+      }
+    >
+      <Card className='mt-2'>
+        <CardHeader>
+          <View className='flex-row justify-between items-center'>
+            <CardTitle>{budget.name}</CardTitle>
+            <Text>{budget.type}</Text>
+          </View>
+          <CardDescription>{budget.currency}</CardDescription>
+        </CardHeader>
 
-      <CardContent>
-        <SimpleProgress value={budget.percentageUsed} />
-        <Text>
-          Spent: ${budget.totalSpent.toFixed(2)} of $
-          {budget.totalAmount.toFixed(2)}
-        </Text>
-      </CardContent>
-      <CardFooter>
-        <Text>Remaining: ${budget.remaining.toFixed(2)}</Text>
-      </CardFooter>
-    </Card>
+        <CardContent>
+          <SimpleProgress value={budget.percentageUsed} />
+          <Text>
+            Spent: ${budget.totalSpent.toFixed(2)} of $
+            {budget.totalAmount.toFixed(2)}
+          </Text>
+        </CardContent>
+        <CardFooter>
+          <Text>Remaining: ${budget.remaining.toFixed(2)}</Text>
+        </CardFooter>
+      </Card>
+    </TouchableOpacity>
   );
 }

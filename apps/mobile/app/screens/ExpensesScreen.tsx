@@ -62,6 +62,7 @@ export default function ExpensesScreen() {
   };
 
   const displayedTotal = expenseTotals?.[selected].net ?? 0;
+
   useFocusEffect(
     useCallback(() => {
       refreshExpenses();

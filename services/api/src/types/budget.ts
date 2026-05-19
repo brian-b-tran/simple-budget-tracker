@@ -1,4 +1,5 @@
-import { Budget } from '../../generated/prisma/client';
+import { PaginatedResponse } from '@expense-app/types';
+import { Budget, Expense } from '../../generated/prisma/client';
 export type BudgetSummary = Budget & {
   totalSpent: number;
   remaining: number;
@@ -11,4 +12,8 @@ export type BudgetCategoryBreakdown = {
   categoryName: string;
   spent: number;
   percentageOfTotal: number;
+};
+
+export type BudgetDetail = BudgetSummary & {
+  expenses: PaginatedResponse<Expense>;
 };

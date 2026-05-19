@@ -10,7 +10,9 @@ import { useNavigation } from '@react-navigation/native';
 interface ExpenseRowProps {
   expense: Expense;
 }
+
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
+
 export default function ExpenseRow({ expense }: ExpenseRowProps) {
   const navigation = useNavigation<NavProp>();
   return (

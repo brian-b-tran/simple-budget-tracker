@@ -80,8 +80,6 @@ export function useExpenses() {
       setErrorState(null);
       setListLoading(true);
       setHasMore(true);
-
-      console.log('Loading Expenses.');
       const expenses = await getFilteredExpenses({
         page: 1,
         limit: 10,
@@ -92,7 +90,9 @@ export function useExpenses() {
       setFilters((prev) => ({ ...prev, page: 1 }));
       setRecentExpenses(expenses);
 
-      console.log(`Items Loaded: PaginatedExpenses: ${expenses.data.length}`);
+      console.log(
+        `Expenses Loaded: PaginatedExpenses: ${expenses.data.length}`
+      );
     } catch (error: any) {
       const errorMsg = error.message
         ? error.message

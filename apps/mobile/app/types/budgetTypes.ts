@@ -1,3 +1,6 @@
+import { PaginatedResponse } from '@expense-app/types';
+import { Expense } from './expenseTypes';
+
 export interface Budget {
   id: string;
   userId: string;
@@ -27,3 +30,7 @@ export interface CategoryBreakdown {
   spent: number;
   percentageOfTotal: number;
 }
+
+export type BudgetDetail = BudgetSummary & {
+  expenses: PaginatedResponse<Expense>;
+};

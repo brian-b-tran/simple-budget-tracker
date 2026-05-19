@@ -62,8 +62,6 @@ export function useRecurringExpenses() {
       setErrorState(null);
       setListLoading(true);
       setHasMoreRecurring(true);
-
-      console.log('Loading Recurring Expenses.');
       const expenses = await getFilteredRecurringExpenses({
         page: 1,
         limit: 10,
@@ -74,7 +72,9 @@ export function useRecurringExpenses() {
       setFilters((prev) => ({ ...prev, page: 1 }));
       setRecurringExpenses(expenses);
 
-      console.log(`Items Loaded: PaginatedExpenses: ${expenses.data.length}`);
+      console.log(
+        `Recurring Expenses Loaded: PaginatedExpenses: ${expenses.data.length}`
+      );
     } catch (error: any) {
       const errorMsg = error.message
         ? error.message

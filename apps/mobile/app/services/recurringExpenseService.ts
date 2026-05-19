@@ -60,7 +60,6 @@ export async function getFilteredRecurringExpenses(
   filter: FilterExpenseInput
 ): Promise<PaginatedRecurringExpense> {
   try {
-    console.log('Frontend Recurring Expense service');
     const { data } = await api.get<PaginatedRecurringExpense>(
       `/recurring-expenses/filter`,
       {

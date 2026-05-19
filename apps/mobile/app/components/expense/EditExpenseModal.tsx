@@ -31,6 +31,7 @@ import { Expense } from '@/app/types/expenseTypes';
 interface EditExpenseModalProps {
   visible: boolean;
   onClose: () => void;
+  onSuccess: () => void;
   expense: Expense;
 }
 
@@ -38,6 +39,7 @@ export default function EditExpenseModal({
   visible,
   onClose,
   expense,
+  onSuccess,
 }: EditExpenseModalProps) {
   const [apiError, setApiError] = useState<boolean>(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -66,15 +68,19 @@ export default function EditExpenseModal({
     try {
       console.log(data);
       await updateExpense(data, expense.id);
-      expenseForm.reset({ type: 'EXPENSE', currencyOriginal: 'CAD' });
-      handleClose();
+      resetForm();
+      onSuccess();
     } catch (error: any) {
       console.log('Full error:', JSON.stringify(error.response?.data));
       setApiError(true);
     }
   };
 
-  const handleClose = () => {
+  const resetForm = () => {
+    const date = new Date(expense.date);
+    const time = new Date(expense.time);
+    setSelectedDate(date);
+    setSelectedTime(time);
     expenseForm.reset({
       categoryId: expense.categoryId,
       date: new Date(expense.date),
@@ -85,12 +91,10 @@ export default function EditExpenseModal({
       notes: expense.notes,
       amountOriginal: expense.amountOriginal.toFixed(2),
     });
-    const date = new Date(expense.date);
-    const time = new Date(expense.time);
-    setSelectedDate(date);
-    setSelectedTime(time);
-    expenseForm.setValue('date', date);
-    expenseForm.setValue('time', time);
+  };
+
+  const handleClose = () => {
+    resetForm();
     onClose();
   };
 
@@ -99,34 +103,19 @@ export default function EditExpenseModal({
     const fetchCategory = async () => {
       await getCategories().then((cats) => {
         setCategories(cats);
-        const selectedCat = cats.find((c) => c.name === expense.category?.name);
-        if (selectedCat) {
-          expenseForm.setValue('categoryId', selectedCat.id);
-        } else {
-          expenseForm.setValue('categoryId', expense.categoryId);
-        }
       });
     };
+
     const fetchBudgets = async () => {
       await getAllBudgets().then((budgets) => {
         setBudgets(budgets);
-        if (expense.budgetId) {
-          expenseForm.setValue('budgetId', expense.budgetId);
-        } else {
-          expenseForm.setValue('budgetId', '');
-        }
       });
     };
 
     if (visible) {
+      resetForm();
       fetchCategory();
       fetchBudgets();
-      const date = new Date(expense.date);
-      const time = new Date(expense.time);
-      setSelectedDate(date);
-      setSelectedTime(time);
-      expenseForm.setValue('date', date);
-      expenseForm.setValue('time', time);
     }
   }, [visible]);
 
