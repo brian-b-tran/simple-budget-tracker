@@ -6,6 +6,7 @@ import {
   createBudgetService,
   updateBudgetService,
   deleteBudgetService,
+  getBudgetDetailService,
 } from '../services/budgetService';
 import {
   createBudgetBackendSchema,
@@ -23,6 +24,26 @@ export async function getBudgetController(
     );
 
     res.status(200).json(budget);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    } else {
+      res
+        .status(500)
+        .json({ message: 'Internal server error Budget endpoint.' });
+    }
+  }
+}
+export async function getBudgetDetailController(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const budgetDetail = await getBudgetDetailService(
+      req.user!.userId,
+      req.params.id as string
+    );
+    res.status(200).json(budgetDetail);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });

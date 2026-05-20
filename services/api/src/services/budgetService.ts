@@ -4,7 +4,12 @@ import {
   CreateBudgetBackendInput,
   UpdateBudgetBackendInput,
 } from '@expense-app/types';
-import type { BudgetSummary, BudgetCategoryBreakdown } from '../types/budget';
+import type {
+  BudgetSummary,
+  BudgetCategoryBreakdown,
+  BudgetDetail,
+} from '../types/budget';
+import { filterExpenseService } from './expenseService';
 
 export async function getBudgetService(
   userId: string,
@@ -75,7 +80,23 @@ export async function getBudgetService(
     categoryBreakdown: categoryBreakdownArray,
   };
 }
+export async function getBudgetDetailService(
+  userId: string,
+  budgetId: string
+): Promise<BudgetDetail> {
+  const budget = await getBudgetService(userId, budgetId);
 
+  const expenses = await filterExpenseService(userId, {
+    page: 1,
+    limit: 100,
+    sortBy: 'date',
+    sortOrder: 'desc',
+    startDate: budget.startDate || undefined,
+    endDate: budget.endDate || undefined,
+    budgetId: budgetId,
+  });
+  return { ...budget, expenses };
+}
 export async function getAllBudgetsService(
   userId: string
 ): Promise<Array<Budget>> {
