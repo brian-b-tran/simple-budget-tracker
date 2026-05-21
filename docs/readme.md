@@ -18,16 +18,14 @@ A cross-platform application to track personal expenses, manage monthly budgets,
   - Node.js
   - Express
   - TypeScript
-  - Zod (validation)
+  - Prisma
 - **Database**
   - PostgreSQL
-  - ExchangeRate caching
 - **Auth**
   - JWT + Refresh Tokens
   - Multi-device sessions
 - **Infrastructure**
   - Docker & Docker Compose
-  - Cloud-ready for AWS/GCP
   - Cron workers for recurring expenses
 - **CI/CD**
   - GitHub Actions
@@ -258,3 +256,4 @@ Refer to [docs/domain_models.md](docs/domain_models.md) for the full ERD, tables
 # License
 
 MIT © 2026
+
