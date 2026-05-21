@@ -2,7 +2,7 @@ import {
   CreateBudgetFrontendInput,
   UpdateBudgetFrontendInput,
 } from '@expense-app/types';
-import { Budget, BudgetSummary } from '../types/budgetTypes';
+import { Budget, BudgetDetail, BudgetSummary } from '../types/budgetTypes';
 import { handleError } from '../utils/serviceUtils';
 import api from './api';
 
@@ -26,6 +26,32 @@ export const getBudget = async (budgetId: string): Promise<BudgetSummary> => {
     const { data } = await api.get<BudgetSummary>(`/budgets/${budgetId}`);
     return {
       ...data,
+      totalAmount: Number(data.totalAmount),
+      totalSpent: Number(data.totalSpent),
+      remaining: Number(data.remaining),
+      percentageUsed: Number(data.percentageUsed),
+    };
+  } catch (error: any) {
+    return handleError(error);
+  }
+};
+
+export const getBudgetDetail = async (
+  budgetId: string
+): Promise<BudgetDetail> => {
+  try {
+    const { data } = await api.get<BudgetDetail>(`/budgets/${budgetId}/detail`);
+    return {
+      ...data,
+      expenses: {
+        ...data.expenses,
+        data: data.expenses.data.map((expense) => ({
+          ...expense,
+          amountOriginal: Number(expense.amountOriginal),
+          amountBase: Number(expense.amountBase),
+          exchangeRateUsed: Number(expense.exchangeRateUsed),
+        })),
+      },
       totalAmount: Number(data.totalAmount),
       totalSpent: Number(data.totalSpent),
       remaining: Number(data.remaining),
