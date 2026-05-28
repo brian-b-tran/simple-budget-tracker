@@ -12,9 +12,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
-import { deleteBudget, getBudget } from '../services/budgetService';
-import { BudgetSummary } from '../types/budgetTypes';
-
+import { deleteBudget, getBudgetDetail } from '../services/budgetService';
+import { BudgetDetail } from '../types/budgetTypes';
+import SimpleProgress from '../components/ui/simpleProgress';
+import { Category } from '../types/categoryTypes';
+import { Progress } from '@/components/ui/progress';
+import { Expense } from '../types/expenseTypes';
 type BudgetDetailRouteProp = RouteProp<RootStackParamList, 'BudgetDetail'>;
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -22,17 +25,18 @@ export default function BudgetDetailScreen() {
   const route = useRoute<BudgetDetailRouteProp>();
   const { budgetId } = route.params;
   const navigation = useNavigation<NavProp>();
-  const [budgetDetail, setBudgetDetail] = useState<BudgetSummary>();
+  const [budgetDetail, setBudgetDetail] = useState<BudgetDetail>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorState, setErrorState] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
-
+  const [groupedExpenses, setGroupedExpenses] = useState({});
   const loadBudget = async () => {
     setIsLoading(true);
     try {
-      const budget = await getBudget(budgetId);
+      const budget = await getBudgetDetail(budgetId);
       setBudgetDetail(budget);
+      setGroupedExpenses(groupExpensesByDate(budget.expenses.data));
     } catch (error: any) {
       setErrorState(error.message);
     } finally {
@@ -50,7 +54,7 @@ export default function BudgetDetailScreen() {
   const onDelete = async (id: string) => {
     try {
       setErrorState(null);
-      //await deleteBudget(id);
+      await deleteBudget(id);
       navigation.goBack();
     } catch (error: any) {
       setErrorState(error.message);
@@ -112,7 +116,26 @@ export default function BudgetDetailScreen() {
         contentContainerStyle={{ flex: 1, justifyContent: 'center' }}
       >
         {/*Details */}
-        <View className='flex center p-6 bg-white rounded-xl'></View>
+        <View className='flex center p-6 bg-white rounded-xl'>
+          <View className=''>
+            <Text className='h1'>Progress</Text>
+            <SimpleProgress value={budgetDetail.percentageUsed} />
+            <Text className='h2'>
+              Spent: ${budgetDetail.totalSpent.toFixed(2)} of $
+              {budgetDetail.totalAmount.toFixed(2)}
+            </Text>
+            <Text className='h2'>
+              Remaining: ${budgetDetail.remaining.toFixed(2)}
+            </Text>
+
+            <Text className='h2'>
+              Total: ${budgetDetail.totalAmount.toFixed(2)}
+            </Text>
+          </View>
+          <View className=''>
+            <Text className='h1'>Category Breakdowns</Text>
+          </View>
+        </View>
 
         {/*Edit and Delete */}
         <View className='p-4 flex-row gap-4 mt-6 relative bottom-0'>
@@ -133,3 +156,42 @@ export default function BudgetDetailScreen() {
     </SafeAreaView>
   );
 }
+
+/* 
+Budget progress 
+Amount spent
+Amount Remaining
+Timeframe if exists
+List of transactions filterable defaulted to groups of dates
+
+
+sections:
+Header: budget name, type, date range if exists
+Progress section: SimpleProgress + spent/remaining/total
+Category breakdown: list of categories with their percentage
+Date range tabs: computed from budget dates (weekly or monthly)
+Expense list: filtered by selected tab
+
+The grouping function needs to:
+
+Take the flat expenses array from BudgetDetail
+Determine if the budget is weekly-grouped or monthly-grouped (based on date span)
+Group expenses into buckets by week or month
+Label each bucket with a human-readable heading
+
+
+grouping function for weeks or months depending on budget timeframes
+
+Current week → "This Week"
+Previous week → "Last Week"
+2 weeks ago → "Two Weeks Ago"
+Anything older → "Week of [date]" e.g. "Week of Mar 3"
+
+Current month → "This Month"
+Previous month → "Last Month"
+Anything older → the month name e.g. "March", "February"
+*/
+
+let groupExpensesByDate = (expenses: Expense[]): Expense[] => {
+  return [];
+};

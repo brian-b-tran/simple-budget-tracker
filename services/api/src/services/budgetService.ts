@@ -80,6 +80,7 @@ export async function getBudgetService(
     categoryBreakdown: categoryBreakdownArray,
   };
 }
+
 export async function getBudgetDetailService(
   userId: string,
   budgetId: string
