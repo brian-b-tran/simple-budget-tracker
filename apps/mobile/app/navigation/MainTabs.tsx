@@ -6,7 +6,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import ReminderScreen from '../screens/RemindersScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { TouchableOpacity, View, Text } from 'react-native';
-import AddExpenseModal from '../components/expense/AddExpenseModal';
+import AddExpenseModal from '../components/expense/expenseForms/AddExpenseModal';
 
 const Tab = createBottomTabNavigator();
 interface MainTabsProps {

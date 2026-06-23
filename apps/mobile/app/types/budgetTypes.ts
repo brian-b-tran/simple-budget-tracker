@@ -21,7 +21,7 @@ export interface BudgetSummary extends Budget {
   totalSpent: number;
   remaining: number;
   percentageUsed: number;
-  categoryBreakdown: CategoryBreakdown[];
+  categoryBreakdowns: CategoryBreakdown[];
 }
 
 export interface CategoryBreakdown {

@@ -17,7 +17,9 @@ import { BudgetDetail } from '../types/budgetTypes';
 import SimpleProgress from '../components/ui/simpleProgress';
 import { Category } from '../types/categoryTypes';
 import { Progress } from '@/components/ui/progress';
-import { Expense } from '../types/expenseTypes';
+import { Expense, ExpenseGroup } from '../types/expenseTypes';
+import { groupExpenses } from '../utils/transactionGrouping';
+import ExpenseRow from '../components/expense/ExpenseRow';
 type BudgetDetailRouteProp = RouteProp<RootStackParamList, 'BudgetDetail'>;
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -30,13 +32,13 @@ export default function BudgetDetailScreen() {
   const [errorState, setErrorState] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
-  const [groupedExpenses, setGroupedExpenses] = useState({});
+  const [groupedExpenses, setGroupedExpenses] = useState<ExpenseGroup[]>([]);
   const loadBudget = async () => {
     setIsLoading(true);
     try {
       const budget = await getBudgetDetail(budgetId);
       setBudgetDetail(budget);
-      setGroupedExpenses(groupExpensesByDate(budget.expenses.data));
+      setGroupedExpenses(groupExpenses(budget.expenses.data));
     } catch (error: any) {
       setErrorState(error.message);
     } finally {
@@ -113,29 +115,71 @@ export default function BudgetDetailScreen() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        contentContainerStyle={{ flex: 1, justifyContent: 'center' }}
+        contentContainerStyle={{ flex: 1 }}
       >
         {/*Details */}
         <View className='flex center p-6 bg-white rounded-xl'>
           <View className=''>
-            <Text className='h1'>Progress</Text>
+            <Text className='text-xl font-bold text-slate-800'>Progress</Text>
             <SimpleProgress value={budgetDetail.percentageUsed} />
-            <Text className='h2'>
+            <Text className='text-lg font-bold text-slate-800'>
               Spent: ${budgetDetail.totalSpent.toFixed(2)} of $
               {budgetDetail.totalAmount.toFixed(2)}
             </Text>
-            <Text className='h2'>
+            <Text className='text-lg font-bold text-slate-800'>
               Remaining: ${budgetDetail.remaining.toFixed(2)}
             </Text>
 
-            <Text className='h2'>
+            <Text className='text-lg font-bold text-slate-800'>
               Total: ${budgetDetail.totalAmount.toFixed(2)}
             </Text>
           </View>
-          <View className=''>
-            <Text className='h1'>Category Breakdowns</Text>
-          </View>
         </View>
+        {groupedExpenses.length > 0 ? (
+          <View>
+            <View className='flex center p-6 bg-white rounded-xl'>
+              <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+                Category Breakdowns
+              </Text>
+
+              <View>
+                {budgetDetail.categoryBreakdowns.map((cat) => (
+                  <View key={cat.categoryId}>
+                    <Text>{cat.categoryName}</Text>
+                    <Text>
+                      Spent: ${cat.spent.toFixed(2)} (%
+                      {cat.percentageOfTotal.toFixed(1)})
+                    </Text>
+                    <SimpleProgress value={cat.percentageOfTotal} />
+                  </View>
+                ))}
+              </View>
+            </View>
+            <View className='flex center p-6 bg-white rounded-xl'>
+              <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+                Transactions in Budget
+              </Text>
+              <View>
+                {groupedExpenses.map((group) => (
+                  <View key={group.label}>
+                    <Text className='text-slate-500 font-semibold mt-4 mb-1'>
+                      {group.label}
+                    </Text>
+                    {group.expenses.map((expense) => (
+                      <ExpenseRow key={expense.id} expense={expense} />
+                    ))}
+                  </View>
+                ))}
+              </View>
+            </View>
+          </View>
+        ) : (
+          <View>
+            <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+              No Transactions in Budget Yet.
+            </Text>
+          </View>
+        )}
 
         {/*Edit and Delete */}
         <View className='p-4 flex-row gap-4 mt-6 relative bottom-0'>
@@ -172,26 +216,4 @@ Category breakdown: list of categories with their percentage
 Date range tabs: computed from budget dates (weekly or monthly)
 Expense list: filtered by selected tab
 
-The grouping function needs to:
-
-Take the flat expenses array from BudgetDetail
-Determine if the budget is weekly-grouped or monthly-grouped (based on date span)
-Group expenses into buckets by week or month
-Label each bucket with a human-readable heading
-
-
-grouping function for weeks or months depending on budget timeframes
-
-Current week → "This Week"
-Previous week → "Last Week"
-2 weeks ago → "Two Weeks Ago"
-Anything older → "Week of [date]" e.g. "Week of Mar 3"
-
-Current month → "This Month"
-Previous month → "Last Month"
-Anything older → the month name e.g. "March", "February"
 */
-
-let groupExpensesByDate = (expenses: Expense[]): Expense[] => {
-  return [];
-};

@@ -1,1 +1,1 @@
-export { getDateRange } from './utils/dateRanges';
+export { getDateRange, getWeekStart } from './utils/dateRanges';

@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDate, formatTime } from '../utils/dateUtils';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import EditExpenseModal from '../components/expense/EditExpenseModal';
+import EditExpenseModal from '../components/expense/expenseForms/EditExpenseModal';
 
 /**  
   id: string;
