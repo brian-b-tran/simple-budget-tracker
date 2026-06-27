@@ -93,7 +93,7 @@ start time - end time
           >
             <View className='flex-row justify-between items-center'>
               <Text className='text-lg font-bold text-slate-800'>
-                Edit Expense
+                Add Budget
               </Text>
               <TouchableOpacity onPress={handleClose}>
                 <Text className='text-slate-400'>close</Text>
@@ -133,6 +133,9 @@ start time - end time
                   </View>
 
                   {/*Type field*/}
+                  <Text className='mb-2 pl-2 text-slate-600 font-medium'>
+                    Type of Budget
+                  </Text>
                   <View className='flex-row flex-wrap gap-2 mb-4'>
                     {[
                       'MONTHLY',
@@ -154,6 +157,7 @@ start time - end time
                             ? 'bg-indigo-600 p-4 rounded-xl items-center'
                             : 'bg-white border border-slate-200 p-4 rounded-xl items-center'
                         }
+                        key={interval}
                       >
                         <Text
                           className={
@@ -171,7 +175,7 @@ start time - end time
                   {/*Amount field*/}
                   <View className='mb-4'>
                     <Text className='mb-2 pl-2 text-slate-600 font-medium'>
-                      Amount
+                      Budget Amount
                     </Text>
 
                     <Controller
@@ -194,15 +198,6 @@ start time - end time
                         />
                       )}
                     />
-                    {errors.totalAmount && (
-                      <Text className='pl-2 text-red-300'>
-                        {errors.totalAmount.message}
-                      </Text>
-                    )}
-                  </View>
-
-                  {/*Currency field*/}
-                  <View className='mb-4'>
                     <Controller
                       control={control}
                       name='totalAmount'
@@ -214,7 +209,15 @@ start time - end time
                         </Picker>
                       )}
                     />
+                    {errors.totalAmount && (
+                      <Text className='pl-2 text-red-300'>
+                        {errors.totalAmount.message}
+                      </Text>
+                    )}
                   </View>
+
+                  {/*Currency field*/}
+                  <View className='mb-4'></View>
                   <View className='mb-4'>
                     {/*Notes field*/}
                     <Text className='mb-2 pl-2 text-slate-600 font-medium'>
@@ -239,7 +242,7 @@ start time - end time
                   {/*Submit field*/}
                   <TouchableOpacity
                     onPress={handleSubmit(onSubmit, (errors) =>
-                      console.log('Expense errors:', JSON.stringify(errors))
+                      console.log('Budget errors:', JSON.stringify(errors))
                     )}
                     disabled={isSubmitting}
                     className={`h-14 rounded-xl items-center justify-center ml-6 mr-6 mb-6 ${isSubmitting ? 'bg-indigo-400' : 'bg-indigo-600'}`}

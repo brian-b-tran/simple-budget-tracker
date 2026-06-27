@@ -11,6 +11,7 @@ import { useBudgets } from '../hooks/useBudgets';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BudgetCard from '../components/budget/BudgetCard';
 import { useFocusEffect } from '@react-navigation/native';
+import AddBudgetModal from '../components/budget/budgetForms/AddBudgetModal';
 export default function BudgetsScreen() {
   const {
     budgetSummaries,
@@ -81,13 +82,17 @@ export default function BudgetsScreen() {
         ) : (
           <Text className='text-slate-400 ml-6 mt-2'>No budgets yet</Text>
         )}
-        {/* <TouchableOpacity
+        <TouchableOpacity
           onPress={() => setCreateModalOpen(true)}
           className={`h-14 rounded-xl items-center justify-center mt-4 bg-slate-400`}
         >
-          <Text className='text-white-400 text-xl'>Load More</Text>
-        </TouchableOpacity> */}
+          <Text className='text-white-400 text-xl'>Add New Budget</Text>
+        </TouchableOpacity>
       </ScrollView>
+      <AddBudgetModal
+        visible={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+      ></AddBudgetModal>
     </SafeAreaView>
   );
 }

@@ -39,10 +39,10 @@ export function setupInterceptors(
       if (
         error.response.status === 401 &&
         originalRequest &&
-        !originalRequest._retry
+        !originalRequest.config._retry
       ) {
         console.log('Attempting refresh...');
-        originalRequest._retry = true;
+        originalRequest.config._retry = true;
         try {
           await refresh();
           console.log('Refresh succeeded');

@@ -115,54 +115,70 @@ export default function BudgetDetailScreen() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        contentContainerStyle={{ flex: 1 }}
+        className='flex-1'
+        contentContainerStyle={{ padding: 4 }}
       >
-        {/*Details */}
-        <View className='flex center p-6 bg-white rounded-xl'>
-          <View className=''>
-            <Text className='text-xl font-bold text-slate-800'>Progress</Text>
-            <SimpleProgress value={budgetDetail.percentageUsed} />
+        <View className='mb-2'>
+          <Text className='text-2xl font-bold text-slate-800 text-center'>
+            {budgetDetail.name}
+          </Text>
+        </View>
+        <View className='flex gap-5'>
+          {/*Details */}
+          <View className='flex center p-6 bg-white rounded-xl'>
             <Text className='text-lg font-bold text-slate-800'>
               Spent: ${budgetDetail.totalSpent.toFixed(2)} of $
               {budgetDetail.totalAmount.toFixed(2)}
             </Text>
-            <Text className='text-lg font-bold text-slate-800'>
-              Remaining: ${budgetDetail.remaining.toFixed(2)}
-            </Text>
+            <SimpleProgress value={budgetDetail.percentageUsed} />
 
-            <Text className='text-lg font-bold text-slate-800'>
-              Total: ${budgetDetail.totalAmount.toFixed(2)}
+            <Text className='text-lg font-bold text-slate-800 mt-2'>
+              ${budgetDetail.remaining.toFixed(2)} remaining.
             </Text>
           </View>
-        </View>
-        {groupedExpenses.length > 0 ? (
-          <View>
+
+          {budgetDetail.categoryBreakdown &&
+          budgetDetail.categoryBreakdown.length > 0 ? (
             <View className='flex center p-6 bg-white rounded-xl'>
-              <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+              <Text className='text-xl font-bold text-slate-800'>
                 Category Breakdowns
               </Text>
 
-              <View>
-                {budgetDetail.categoryBreakdowns.map((cat) => (
-                  <View key={cat.categoryId}>
-                    <Text>{cat.categoryName}</Text>
-                    <Text>
-                      Spent: ${cat.spent.toFixed(2)} (%
-                      {cat.percentageOfTotal.toFixed(1)})
-                    </Text>
+              <View className='mb-2'>
+                {budgetDetail.categoryBreakdown.map((cat) => (
+                  <View key={cat.categoryId} className='mb-2 mt-2'>
+                    <View className='flex-row justify-between'>
+                      <Text className='font-bold text-slate-800'>
+                        {cat.categoryName}
+                      </Text>
+                      <Text className='text-slate-600 ml-auto'>
+                        ${cat.spent.toFixed(2)} (%
+                        {cat.percentageOfTotal.toFixed(1)})
+                      </Text>
+                    </View>
+
                     <SimpleProgress value={cat.percentageOfTotal} />
                   </View>
                 ))}
               </View>
             </View>
+          ) : (
+            <View>
+              <Text className='text-xl font-bold text-slate-800'>
+                No Breakdowns Available in Budget Yet.
+              </Text>
+            </View>
+          )}
+
+          {groupedExpenses.length > 0 ? (
             <View className='flex center p-6 bg-white rounded-xl'>
-              <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+              <Text className='text-2xl font-bold text-slate-800 text-center'>
                 Transactions in Budget
               </Text>
               <View>
                 {groupedExpenses.map((group) => (
                   <View key={group.label}>
-                    <Text className='text-slate-500 font-semibold mt-4 mb-1'>
+                    <Text className='text-slate-500 font-semibold mt-4 mb-1 text-right'>
                       {group.label}
                     </Text>
                     {group.expenses.map((expense) => (
@@ -172,48 +188,30 @@ export default function BudgetDetailScreen() {
                 ))}
               </View>
             </View>
-          </View>
-        ) : (
-          <View>
-            <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
-              No Transactions in Budget Yet.
-            </Text>
-          </View>
-        )}
-
-        {/*Edit and Delete */}
-        <View className='p-4 flex-row gap-4 mt-6 relative bottom-0'>
-          <TouchableOpacity
-            className='flex-1 h-14 rounded-xl items-center justify-center bg-slate-300'
-            onPress={() => setEditModalOpen(true)}
-          >
-            <Text className='text-white font-bold'>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className='flex-1 h-14 rounded-xl items-center justify-center bg-slate-600'
-            onPress={() => handleDelete(budgetDetail.id)}
-          >
-            <Text className='text-white font-bold'>Delete</Text>
-          </TouchableOpacity>
+          ) : (
+            <View>
+              <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+                No Transactions in Budget Yet.
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
+      {/*Edit and Delete */}
+      <View className='p-4 flex-row gap-4 mt-6 relative bottom-0'>
+        <TouchableOpacity
+          className='flex-1 h-14 rounded-xl items-center justify-center bg-slate-300'
+          onPress={() => setEditModalOpen(true)}
+        >
+          <Text className='text-white font-bold'>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className='flex-1 h-14 rounded-xl items-center justify-center bg-slate-600'
+          onPress={() => handleDelete(budgetDetail.id)}
+        >
+          <Text className='text-white font-bold'>Delete</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
-
-/* 
-Budget progress 
-Amount spent
-Amount Remaining
-Timeframe if exists
-List of transactions filterable defaulted to groups of dates
-
-
-sections:
-Header: budget name, type, date range if exists
-Progress section: SimpleProgress + spent/remaining/total
-Category breakdown: list of categories with their percentage
-Date range tabs: computed from budget dates (weekly or monthly)
-Expense list: filtered by selected tab
-
-*/
