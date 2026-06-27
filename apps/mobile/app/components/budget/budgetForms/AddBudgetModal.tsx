@@ -4,6 +4,7 @@ import {
   createBudgetFrontendSchema,
 } from '@expense-app/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Picker } from '@react-native-picker/picker';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
@@ -19,23 +20,13 @@ import {
 } from 'react-native';
 
 type AddBudgetModalProps = { visible: boolean; onClose: () => void };
-/* Fields:
-budget name 
-type
-amount
-notes
 
-*only for vacation or events time period based budget
-can be used to automatically divide total budget evenly across the days for a custom amount of days vs fixed like months or years or week.
-
-start date - end date
-start time - end time
-*/
 export default function AddBudgetModal({
   visible,
   onClose,
 }: AddBudgetModalProps) {
   const [apiError, setApiError] = useState<boolean>(false);
+  const [currencies, setCurrencies] = useState<string[]>(['CAD', 'USD', 'JPY']);
   const budgetForm = useForm<CreateBudgetFrontendInput>({
     resolver: zodResolver(createBudgetFrontendSchema),
     defaultValues: {
@@ -75,7 +66,19 @@ export default function AddBudgetModal({
     reset();
     onClose();
   };
+  /* Fields:
+name 
+type
+currency
+totalAmount
+notes
 
+*only for vacation or events time period based budget
+can be used to automatically divide total budget evenly across the days for a custom amount of days vs fixed like months or years or week.
+
+start date - end date
+start time - end time
+*/
   return (
     <Modal visible={visible} animationType='slide' transparent>
       <TouchableOpacity
@@ -102,84 +105,160 @@ export default function AddBudgetModal({
             >
               <ScrollView contentContainerStyle={{ flexGrow: 1 }} className=''>
                 <View className='p-4'>
-                  <View>
-                    {/*Amount field*/}
-                    <View className='mb-4'>
-                      <Text className='mb-2 pl-2 text-slate-600 font-medium'>
-                        Amount
-                      </Text>
-
-                      <Controller
-                        control={control}
-                        name='totalAmount'
-                        render={({ field: { onChange, onBlur, value } }) => (
-                          <TextInput
-                            className={`bg-white border p-4 rounded-xl text-slate-900 ${errors.totalAmount ? 'border-red-500' : 'border-slate-200'}`}
-                            onBlur={onBlur}
-                            onChangeText={(text) => {
-                              const decimalRegex = /^\d*\.?\d*$/;
-
-                              if (decimalRegex.test(text)) {
-                                onChange(text);
-                              }
-                            }}
-                            value={value ?? ''}
-                            placeholder='0.00'
-                            keyboardType='decimal-pad'
-                          />
-                        )}
-                      />
-                      {errors.totalAmount && (
-                        <Text className='pl-2 text-red-300'>
-                          {errors.totalAmount.message}
-                        </Text>
+                  {/*Name Field */}
+                  <View className='mb-4'>
+                    <Text className='mb-2 pl-2 text-slate-600 font-medium'>
+                      Budget Name
+                    </Text>
+                    <Controller
+                      control={control}
+                      name='name'
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          className='bg-white border border-slate-200 p-4 rounded-xl text-slate-900'
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          placeholder='My Budget'
+                          multiline
+                          numberOfLines={3}
+                        />
                       )}
-                    </View>
-                    {/*Type field*/}
-                    <View className='flex-row flex-wrap gap-2 mb-4'>
+                    />
+                    {errors.totalAmount && (
+                      <Text className='pl-2 text-red-300'>
+                        {errors.totalAmount.message}
+                      </Text>
+                    )}
+                  </View>
+
+                  {/*Type field*/}
+                  <View className='flex-row flex-wrap gap-2 mb-4'>
+                    {[
+                      'MONTHLY',
+                      'YEARLY',
+                      'QUARTERLY',
+                      'VACATION',
+                      'EVENT',
+                    ].map((interval: string) => (
                       <TouchableOpacity
-                        onPress={() => setValue('type', 'MONTHLY')}
+                        onPress={() =>
+                          setValue(
+                            'type',
+                            interval as CreateBudgetFrontendInput['type']
+                          )
+                        }
                         style={{ width: '48%' }}
                         className={
-                          watch('type') === 'MONTHLY'
+                          watch('type') === interval
                             ? 'bg-indigo-600 p-4 rounded-xl items-center'
                             : 'bg-white border border-slate-200 p-4 rounded-xl items-center'
                         }
                       >
                         <Text
                           className={
-                            watch('type') === 'MONTHLY'
+                            watch('type') === interval
                               ? 'text-white font-medium'
                               : 'text-slate-600'
                           }
                         >
-                          Income
+                          {interval}
                         </Text>
                       </TouchableOpacity>
-                    </View>
+                    ))}
                   </View>
+
+                  {/*Amount field*/}
+                  <View className='mb-4'>
+                    <Text className='mb-2 pl-2 text-slate-600 font-medium'>
+                      Amount
+                    </Text>
+
+                    <Controller
+                      control={control}
+                      name='totalAmount'
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          className={`bg-white border p-4 rounded-xl text-slate-900 ${errors.totalAmount ? 'border-red-500' : 'border-slate-200'}`}
+                          onBlur={onBlur}
+                          onChangeText={(text) => {
+                            const decimalRegex = /^\d*\.?\d*$/;
+
+                            if (decimalRegex.test(text)) {
+                              onChange(text);
+                            }
+                          }}
+                          value={value ?? ''}
+                          placeholder='0.00'
+                          keyboardType='decimal-pad'
+                        />
+                      )}
+                    />
+                    {errors.totalAmount && (
+                      <Text className='pl-2 text-red-300'>
+                        {errors.totalAmount.message}
+                      </Text>
+                    )}
+                  </View>
+
+                  {/*Currency field*/}
+                  <View className='mb-4'>
+                    <Controller
+                      control={control}
+                      name='totalAmount'
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <Picker selectedValue={value} onValueChange={onChange}>
+                          {currencies.map((cur) => (
+                            <Picker.Item key={cur} label={cur} value={cur} />
+                          ))}
+                        </Picker>
+                      )}
+                    />
+                  </View>
+                  <View className='mb-4'>
+                    {/*Notes field*/}
+                    <Text className='mb-2 pl-2 text-slate-600 font-medium'>
+                      Notes
+                    </Text>
+                    <Controller
+                      control={control}
+                      name='notes'
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          className='bg-white border border-slate-200 p-4 rounded-xl text-slate-900'
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          placeholder='Optional notes...'
+                          multiline
+                          numberOfLines={3}
+                        />
+                      )}
+                    />
+                  </View>
+                  {/*Submit field*/}
+                  <TouchableOpacity
+                    onPress={handleSubmit(onSubmit, (errors) =>
+                      console.log('Expense errors:', JSON.stringify(errors))
+                    )}
+                    disabled={isSubmitting}
+                    className={`h-14 rounded-xl items-center justify-center ml-6 mr-6 mb-6 ${isSubmitting ? 'bg-indigo-400' : 'bg-indigo-600'}`}
+                  >
+                    {isSubmitting ? (
+                      <ActivityIndicator color='white' />
+                    ) : (
+                      <Text className='text-white font-bold text-lg'>save</Text>
+                    )}
+                  </TouchableOpacity>
+
+                  {/*Error field*/}
+                  {apiError && (
+                    <Text className='pl-2 text-red-300 font-small'>
+                      Something went wrong in the backend please try again
+                      later.
+                    </Text>
+                  )}
                 </View>
-
-                {/*Submit field*/}
-                <TouchableOpacity
-                  onPress={handleSubmit(onSubmit, (errors) =>
-                    console.log('Expense errors:', JSON.stringify(errors))
-                  )}
-                  disabled={isSubmitting}
-                  className={`h-14 rounded-xl items-center justify-center ml-6 mr-6 mb-6 ${isSubmitting ? 'bg-indigo-400' : 'bg-indigo-600'}`}
-                >
-                  {isSubmitting ? (
-                    <ActivityIndicator color='white' />
-                  ) : (
-                    <Text className='text-white font-bold text-lg'>save</Text>
-                  )}
-                </TouchableOpacity>
-
-                {apiError && (
-                  <Text className='pl-2 text-red-300 font-small'>
-                    Something went wrong in the backend please try again later.
-                  </Text>
-                )}
               </ScrollView>
             </KeyboardAvoidingView>
           </View>
