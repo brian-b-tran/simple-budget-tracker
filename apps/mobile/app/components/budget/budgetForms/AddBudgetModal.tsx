@@ -1,9 +1,14 @@
 import { createBudget } from '@/app/services/budgetService';
+import { formatDate, formatTime } from '@/app/utils/dateUtils';
 import {
   CreateBudgetFrontendInput,
   createBudgetFrontendSchema,
 } from '@expense-app/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  DateTimePickerAndroid,
+  DateTimePickerEvent,
+} from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -19,14 +24,23 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-type AddBudgetModalProps = { visible: boolean; onClose: () => void };
+type AddBudgetModalProps = {
+  visible: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+};
 
 export default function AddBudgetModal({
   visible,
   onClose,
+  onSuccess,
 }: AddBudgetModalProps) {
   const [apiError, setApiError] = useState<boolean>(false);
   const [currencies, setCurrencies] = useState<string[]>(['CAD', 'USD', 'JPY']);
+  const [selectedStartTime, setSelectedStartTime] = useState<Date>(new Date());
+  const [selectedStartDate, setSelectedStartDate] = useState<Date>(new Date());
+  const [selectedEndTime, setSelectedEndTime] = useState<Date>(new Date());
+  const [selectedEndDate, setSelectedEndDate] = useState<Date>(new Date());
   const budgetForm = useForm<CreateBudgetFrontendInput>({
     resolver: zodResolver(createBudgetFrontendSchema),
     defaultValues: {
@@ -56,7 +70,7 @@ export default function AddBudgetModal({
       console.log(data);
       await createBudget(data);
       reset();
-      handleClose();
+      onSuccess();
     } catch (error: any) {
       setApiError(true);
     }
@@ -125,9 +139,9 @@ start time - end time
                         />
                       )}
                     />
-                    {errors.totalAmount && (
+                    {errors.name && (
                       <Text className='pl-2 text-red-300'>
-                        {errors.totalAmount.message}
+                        {errors.name.message}
                       </Text>
                     )}
                   </View>
@@ -198,9 +212,11 @@ start time - end time
                         />
                       )}
                     />
+
+                    {/*Currency field (inline with amount eventually)*/}
                     <Controller
                       control={control}
-                      name='totalAmount'
+                      name='currency'
                       render={({ field: { onChange, onBlur, value } }) => (
                         <Picker selectedValue={value} onValueChange={onChange}>
                           {currencies.map((cur) => (
@@ -209,15 +225,119 @@ start time - end time
                         </Picker>
                       )}
                     />
-                    {errors.totalAmount && (
+                    {errors.currency && (
                       <Text className='pl-2 text-red-300'>
-                        {errors.totalAmount.message}
+                        {errors.currency.message}
                       </Text>
                     )}
                   </View>
 
-                  {/*Currency field*/}
-                  <View className='mb-4'></View>
+                  {/*Conditional render for time and date period events & vacation types*/}
+                  {(watch('type') === 'VACATION' ||
+                    watch('type') === 'EVENT') && (
+                    <View className='mb-4'>
+                      <Text className='mb-2 pl-2 text-slate-600 font-medium'>
+                        Time Frame
+                      </Text>
+                      <View className='mb-4'>
+                        <Text className='mb-2 pl-2 text-slate-600 font-medium'>
+                          Start Time
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() =>
+                            DateTimePickerAndroid.open({
+                              value: selectedStartTime,
+                              onChange: (
+                                event: DateTimePickerEvent,
+                                time: Date = new Date()
+                              ) => {
+                                setSelectedStartTime(time);
+                                budgetForm.setValue('startTime', time);
+                              },
+                              mode: 'time',
+                              is24Hour: true,
+                            })
+                          }
+                          className='bg-white border border-slate-200 p-4 rounded-xl text-slate-900'
+                        >
+                          <Text>{formatTime(selectedStartTime.toJSON())}</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View className='mb-4'>
+                        <Text className='mb-2 pl-2 text-slate-600 font-medium'>
+                          End Time
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() =>
+                            DateTimePickerAndroid.open({
+                              value: selectedEndTime,
+                              onChange: (
+                                event: DateTimePickerEvent,
+                                time: Date = new Date()
+                              ) => {
+                                setSelectedEndTime(time);
+                                budgetForm.setValue('endTime', time);
+                              },
+                              mode: 'time',
+                              is24Hour: true,
+                            })
+                          }
+                          className='bg-white border border-slate-200 p-4 rounded-xl text-slate-900'
+                        >
+                          <Text>{formatTime(selectedEndTime.toJSON())}</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View className='mb-4'>
+                        <Text className='mb-2 pl-2 text-slate-600 font-medium'>
+                          Start Date
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() =>
+                            DateTimePickerAndroid.open({
+                              value: selectedStartDate,
+                              onChange: (
+                                event: DateTimePickerEvent,
+                                time: Date = new Date()
+                              ) => {
+                                setSelectedStartDate(time);
+                                budgetForm.setValue('startDate', time);
+                              },
+                              mode: 'date',
+                              is24Hour: true,
+                            })
+                          }
+                          className='bg-white border border-slate-200 p-4 rounded-xl text-slate-900'
+                        >
+                          <Text>{formatDate(selectedStartDate.toJSON())}</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View className='mb-4'>
+                        <Text className='mb-2 pl-2 text-slate-600 font-medium'>
+                          End Date
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() =>
+                            DateTimePickerAndroid.open({
+                              value: selectedEndDate,
+                              onChange: (
+                                event: DateTimePickerEvent,
+                                time: Date = new Date()
+                              ) => {
+                                setSelectedEndDate(time);
+                                budgetForm.setValue('endDate', time);
+                              },
+                              mode: 'date',
+                              is24Hour: true,
+                            })
+                          }
+                          className='bg-white border border-slate-200 p-4 rounded-xl text-slate-900'
+                        >
+                          <Text>{formatDate(selectedEndDate.toJSON())}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  )}
+
                   <View className='mb-4'>
                     {/*Notes field*/}
                     <Text className='mb-2 pl-2 text-slate-600 font-medium'>
