@@ -1,5 +1,6 @@
 import { DateRange, RangeKey } from '@expense-app/types/dates';
 
+//takes a Date and timezone and returns the year, month, day, and weekday in a timezone
 function getZonedParts(date: Date, timeZone: string) {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone,
@@ -24,12 +25,13 @@ function getZonedParts(date: Date, timeZone: string) {
   };
 }
 
+//converts a timezone's parts bach into a UTC date
 function zonedMidnightToUTC(
   year: number,
   month: number,
   day: number,
   timeZone: string
-) {
+): Date {
   // Create a date as if it's UTC
   const utcGuess = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
 
@@ -123,4 +125,23 @@ export function getDateRange(range: RangeKey, timeZone: string): DateRange {
     case 'year':
       return getYearRange(timeZone);
   }
+}
+
+export function getWeekStart(date: Date, timeZone: string): Date {
+  const { year, month, day, weekday } = getZonedParts(date, timeZone);
+
+  const offset = weekdayMap[weekday];
+
+  const startDate = new Date(Date.UTC(year, month - 1, day - offset));
+
+  const startParts = getZonedParts(startDate, timeZone);
+
+  const start = zonedMidnightToUTC(
+    startParts.year,
+    startParts.month,
+    startParts.day,
+    timeZone
+  );
+
+  return start;
 }

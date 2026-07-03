@@ -5,14 +5,32 @@ export const budgetBaseSchema = z.object({
   type: z.enum(['MONTHLY', 'YEARLY', 'QUARTERLY', 'VACATION', 'EVENT']),
   currency: z.string().length(3),
   totalAmount: z.number().positive(),
+  notes: z.string().optional(),
+});
+
+export const createBudgetFrontendSchema = budgetBaseSchema.extend({
+  totalAmount: z
+    .string()
+    .min(1, 'Amount is required')
+    .refine((val) => {
+      const parsed = parseFloat(val);
+      return !isNaN(parsed) && parsed !== 0;
+    }),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+  startTime: z.date().optional(),
+  endTime: z.date().optional(),
+});
+
+export const createBudgetBackendSchema = budgetBaseSchema.extend({
+  totalAmount: z
+    .number()
+    .refine((val) => val !== 0, { message: 'Amount cannot be zero' }),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
   startTime: z.coerce.date().optional(),
   endTime: z.coerce.date().optional(),
-  notes: z.string().optional(),
 });
-export const createBudgetFrontendSchema = budgetBaseSchema;
-export const createBudgetBackendSchema = budgetBaseSchema;
 
 export const updateBudgetFrontendSchema = createBudgetFrontendSchema.partial();
 export const updateBudgetBackendSchema = createBudgetBackendSchema.partial();

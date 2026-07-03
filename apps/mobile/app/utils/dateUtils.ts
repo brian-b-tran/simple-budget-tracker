@@ -1,3 +1,5 @@
+import { DateRange } from '@expense-app/types';
+
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
   const dateFormatted = date.toLocaleDateString('en-US', {

@@ -28,3 +28,9 @@ export interface ExpenseTotals {
   year: { income: number; expense: number; net: number };
 }
 export type PaginatedExpense = PaginatedResponse<Expense>;
+
+//for grouping a list of expenses by a label
+export type ExpenseGroup = {
+  label: string;
+  expenses: Expense[];
+};

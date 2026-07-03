@@ -27,11 +27,22 @@ export function setupInterceptors(
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
+      if (!error.response) {
+        console.log('Network error or server unreachable');
+        return Promise.reject(error);
+      }
+
       console.log('Response interceptor hit', error?.response?.status);
+      console.log('Message: ', error?.response?.message);
       console.log('_retry:', error.config?._retry);
-      if (error.response.status === 401 && !originalRequest._retry) {
+
+      if (
+        error.response.status === 401 &&
+        originalRequest &&
+        !originalRequest.config._retry
+      ) {
         console.log('Attempting refresh...');
-        originalRequest._retry = true;
+        originalRequest.config._retry = true;
         try {
           await refresh();
           console.log('Refresh succeeded');
@@ -39,7 +50,7 @@ export function setupInterceptors(
           originalRequest.headers['Authorization'] = `Bearer ${token}`;
           return api(originalRequest);
         } catch {
-          console.log('Refresh failed, emitting sessionExpired');
+          console.log('Refresh failed, emitting session Expired');
           authEvents.emit();
           throw error;
         }
