@@ -20,6 +20,7 @@ import { Progress } from '@/components/ui/progress';
 import { Expense, ExpenseGroup } from '../types/expenseTypes';
 import { groupExpenses } from '../utils/transactionGrouping';
 import ExpenseRow from '../components/expense/ExpenseRow';
+import EditBudgetModal from '../components/budget/budgetForms/EditBudgetModal';
 type BudgetDetailRouteProp = RouteProp<RootStackParamList, 'BudgetDetail'>;
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -212,6 +213,15 @@ export default function BudgetDetailScreen() {
           <Text className='text-white font-bold'>Delete</Text>
         </TouchableOpacity>
       </View>
+      <EditBudgetModal
+        budget={budgetDetail}
+        visible={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSuccess={() => {
+          setEditModalOpen(false);
+          onRefresh();
+        }}
+      ></EditBudgetModal>
     </SafeAreaView>
   );
 }

@@ -80,19 +80,7 @@ export default function AddBudgetModal({
     reset();
     onClose();
   };
-  /* Fields:
-name 
-type
-currency
-totalAmount
-notes
 
-*only for vacation or events time period based budget
-can be used to automatically divide total budget evenly across the days for a custom amount of days vs fixed like months or years or week.
-
-start date - end date
-start time - end time
-*/
   return (
     <Modal visible={visible} animationType='slide' transparent>
       <TouchableOpacity
@@ -145,6 +133,64 @@ start time - end time
                       </Text>
                     )}
                   </View>
+                  {/*Amount field*/}
+                  <View className='mb-4'>
+                    <Text className='mb-2 pl-2 text-slate-600 font-medium'>
+                      Budget Amount
+                    </Text>
+
+                    <Controller
+                      control={control}
+                      name='totalAmount'
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                          className={`bg-white border p-4 rounded-xl text-slate-900 mb-4 ${errors.totalAmount ? 'border-red-500' : 'border-slate-200'}`}
+                          onBlur={onBlur}
+                          onChangeText={(text) => {
+                            const decimalRegex = /^\d*\.?\d*$/;
+
+                            if (decimalRegex.test(text)) {
+                              onChange(text);
+                            }
+                          }}
+                          value={value ?? ''}
+                          placeholder='0.00'
+                          keyboardType='decimal-pad'
+                        />
+                      )}
+                    />
+
+                    {/*Currency field (inline with amount eventually)*/}
+                    <Controller
+                      control={control}
+                      name='currency'
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <View
+                          style={{
+                            backgroundColor: 'white',
+                            borderWidth: 1,
+                            borderColor: '#e2e8f0',
+                            borderRadius: 12,
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <Picker
+                            selectedValue={value}
+                            onValueChange={onChange}
+                          >
+                            {currencies.map((cur) => (
+                              <Picker.Item key={cur} label={cur} value={cur} />
+                            ))}
+                          </Picker>
+                        </View>
+                      )}
+                    />
+                    {errors.currency && (
+                      <Text className='pl-2 text-red-300'>
+                        {errors.currency.message}
+                      </Text>
+                    )}
+                  </View>
 
                   {/*Type field*/}
                   <Text className='mb-2 pl-2 text-slate-600 font-medium'>
@@ -186,57 +232,11 @@ start time - end time
                     ))}
                   </View>
 
-                  {/*Amount field*/}
-                  <View className='mb-4'>
-                    <Text className='mb-2 pl-2 text-slate-600 font-medium'>
-                      Budget Amount
-                    </Text>
-
-                    <Controller
-                      control={control}
-                      name='totalAmount'
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                          className={`bg-white border p-4 rounded-xl text-slate-900 ${errors.totalAmount ? 'border-red-500' : 'border-slate-200'}`}
-                          onBlur={onBlur}
-                          onChangeText={(text) => {
-                            const decimalRegex = /^\d*\.?\d*$/;
-
-                            if (decimalRegex.test(text)) {
-                              onChange(text);
-                            }
-                          }}
-                          value={value ?? ''}
-                          placeholder='0.00'
-                          keyboardType='decimal-pad'
-                        />
-                      )}
-                    />
-
-                    {/*Currency field (inline with amount eventually)*/}
-                    <Controller
-                      control={control}
-                      name='currency'
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <Picker selectedValue={value} onValueChange={onChange}>
-                          {currencies.map((cur) => (
-                            <Picker.Item key={cur} label={cur} value={cur} />
-                          ))}
-                        </Picker>
-                      )}
-                    />
-                    {errors.currency && (
-                      <Text className='pl-2 text-red-300'>
-                        {errors.currency.message}
-                      </Text>
-                    )}
-                  </View>
-
                   {/*Conditional render for time and date period events & vacation types*/}
                   {(watch('type') === 'VACATION' ||
                     watch('type') === 'EVENT') && (
                     <View className='mb-4'>
-                      <Text className='mb-2 pl-2 text-slate-600 font-medium'>
+                      <Text className='mb-2 pl-2 text-slate-600 font-medium text-center'>
                         Time Frame
                       </Text>
                       <View className='mb-4'>
