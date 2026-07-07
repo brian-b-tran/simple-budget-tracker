@@ -14,6 +14,7 @@ import {
 import {
   createExpenseFrontendSchema,
   CreateExpenseFrontendInput,
+  currencyEntries,
 } from '@expense-app/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createExpense } from '@/app/services/expenseService';
@@ -32,6 +33,7 @@ import {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 import { formatDate, formatTime } from '../../../utils/dateUtils';
+import { useAuth } from '../../../store/authContext';
 interface AddExpenseModalProps {
   visible: boolean;
   onClose: () => void;
@@ -51,18 +53,21 @@ export default function AddExpenseModal({
   const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(
     new Date()
   );
-
+  const { userProfile } = useAuth();
   //forms
   const expenseForm = useForm<CreateExpenseFrontendInput>({
     resolver: zodResolver(createExpenseFrontendSchema),
-    defaultValues: { type: 'EXPENSE', currencyOriginal: 'CAD' },
+    defaultValues: {
+      type: 'EXPENSE',
+      currencyOriginal: userProfile?.currency ?? 'CAD',
+    },
   });
 
   const recurringForm = useForm<CreateRecurringExpenseFrontendInput>({
     resolver: zodResolver(createRecurringExpenseFrontendSchema),
     defaultValues: {
       type: 'EXPENSE',
-      currencyOriginal: 'CAD',
+      currencyOriginal: userProfile?.currency ?? 'CAD',
       frequency: 'DAILY',
       interval: 1,
     },
@@ -101,7 +106,10 @@ export default function AddExpenseModal({
     try {
       console.log(data);
       await createExpense(data);
-      expenseForm.reset({ type: 'EXPENSE', currencyOriginal: 'CAD' });
+      expenseForm.reset({
+        type: 'EXPENSE',
+        currencyOriginal: userProfile?.currency ?? 'CAD',
+      });
       handleClose();
     } catch (error: any) {
       console.log('Full error:', JSON.stringify(error.response?.data));
@@ -118,7 +126,7 @@ export default function AddExpenseModal({
       await createRecurringExpense(data);
       recurringForm.reset({
         type: 'EXPENSE',
-        currencyOriginal: 'CAD',
+        currencyOriginal: userProfile?.currency ?? 'CAD',
         frequency: 'DAILY',
         interval: 1,
       });
@@ -148,7 +156,7 @@ export default function AddExpenseModal({
     expenseForm.reset({ type: 'EXPENSE', currencyOriginal: 'CAD' });
     recurringForm.reset({
       type: 'EXPENSE',
-      currencyOriginal: 'CAD',
+      currencyOriginal: userProfile?.currency ?? 'CAD',
       frequency: 'DAILY',
       interval: 1,
     });
@@ -228,7 +236,40 @@ export default function AddExpenseModal({
               {errors.amountOriginal.message}
             </Text>
           )}
+
+          {/*Currency field (inline with amount eventually)*/}
+          <Controller
+            control={control}
+            name='currencyOriginal'
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View
+                style={{
+                  backgroundColor: 'white',
+                  borderWidth: 1,
+                  borderColor: '#e2e8f0',
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                }}
+              >
+                <Picker selectedValue={value} onValueChange={onChange}>
+                  {currencyEntries.map(([code, name]) => (
+                    <Picker.Item
+                      key={code}
+                      label={`${code} - ${name}`}
+                      value={code}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            )}
+          />
+          {errors.currencyOriginal && (
+            <Text className='pl-2 text-red-300'>
+              {errors.currencyOriginal.message}
+            </Text>
+          )}
         </View>
+
         {/*Type field*/}
         <View className='flex-row flex-wrap gap-2 mb-4'>
           <TouchableOpacity
@@ -363,7 +404,7 @@ export default function AddExpenseModal({
         <TouchableOpacity activeOpacity={1}>
           <View
             className='bg-white rounded-t-3xl p-6'
-            style={{ minHeight: '80%' }}
+            style={{ minHeight: '90%' }}
           >
             <View className='flex-row justify-between items-center'>
               <Text className='text-lg font-bold text-slate-800'>

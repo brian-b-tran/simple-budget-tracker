@@ -34,3 +34,9 @@ export type ExpenseGroup = {
   label: string;
   expenses: Expense[];
 };
+
+//displaying expenses from different currencies
+export type FormattedExpenseAmount = {
+  amountOriginalString: string;
+  amountConvertedString?: string;
+};

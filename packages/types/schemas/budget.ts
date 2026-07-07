@@ -1,9 +1,12 @@
 import { z } from 'zod';
+import { currencies } from '../constants/currencies';
+
+const currencyCodes = Object.keys(currencies) as [string, ...string[]];
 
 export const budgetBaseSchema = z.object({
   name: z.string(),
   type: z.enum(['MONTHLY', 'YEARLY', 'QUARTERLY', 'VACATION', 'EVENT']),
-  currency: z.string().length(3),
+  currency: z.enum(currencyCodes),
   totalAmount: z.number().positive(),
   notes: z.string().optional(),
 });

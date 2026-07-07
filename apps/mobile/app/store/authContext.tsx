@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import React from 'react';
 import * as SecureStore from 'expo-secure-store';
 import {
+  getUserProfile,
   loginService,
   logoutService,
   refreshAccessService,
@@ -9,10 +10,12 @@ import {
 } from '../services/authService';
 import { setupInterceptors } from '../services/api';
 import authEvents from '../utils/authEvents';
+import { UserProfile } from '@expense-app/types';
 
 interface AuthContextType {
   accessToken: string | null;
   isLoading: boolean;
+  userProfile: UserProfile | null;
   register: (email: string, password: string) => void;
   login: (email: string, password: string) => void;
   logout: () => void;
@@ -25,12 +28,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const accessTokenRef = useRef<string | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const login = async (email: string, password: string) => {
     try {
       console.log('trying to log in.');
       const token = await loginService(email, password);
       await SecureStore.setItemAsync('accessToken', token.access);
       setAccessToken(token.access);
+      const user = await getUserProfile();
+      setUserProfile(user);
     } catch (error) {
       //console.error('Failed to login.', error);
       throw error;
@@ -48,6 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     await logoutService();
     await SecureStore.deleteItemAsync('accessToken');
+    setUserProfile(null);
     setAccessToken(null);
   };
 
@@ -76,6 +83,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const token = await SecureStore.getItemAsync('accessToken');
         if (token) {
           await refresh();
+          try {
+            const user = await getUserProfile();
+            setUserProfile(user);
+          } catch (error) {
+            console.error('Failed to load user profile', error);
+          }
         }
       } catch (error) {
         console.error('Failed to load token from SecureStore', error);
@@ -97,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         register,
         refresh,
         logout,
+        userProfile: userProfile,
       }}
     >
       {children}

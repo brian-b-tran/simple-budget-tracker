@@ -1,11 +1,13 @@
 import { z } from 'zod';
+import { currencies } from '../constants/currencies';
 
+const currencyCodes = Object.keys(currencies) as [string, ...string[]];
 export const expenseBaseSchema = z.object({
   categoryId: z.uuid().min(1),
   date: z.date(),
   time: z.date(),
   type: z.enum(['EXPENSE', 'INCOME']),
-  currencyOriginal: z.string().length(3),
+  currencyOriginal: z.enum(currencies),
   budgetId: z.string().optional(),
   recurringExpenseId: z.string().optional(),
   notes: z.string().optional(),

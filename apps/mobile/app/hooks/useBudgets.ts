@@ -13,7 +13,6 @@ export function useBudgets() {
     try {
       const budgets = await getAllBudgets();
       setBudgetsSummaries(budgets);
-      console.log(`Budgets Loaded: PaginatedExpenses: ${budgets.length}`);
     } catch (error: any) {
       const errorMsg = error.message
         ? error.message

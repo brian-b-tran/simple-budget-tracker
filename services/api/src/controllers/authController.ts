@@ -5,6 +5,7 @@ import {
   refreshTokensService,
   logoutUserService,
   logoutAllUserService,
+  meService,
 } from '../services/authService';
 import {
   userRegisterSchema,
@@ -135,6 +136,15 @@ export async function logoutAllUserController(
   }
 }
 
-export function meController(req: Request, res: Response): void {
-  res.status(200).json({ user: req.user });
+export async function meController(req: Request, res: Response): Promise<void> {
+  try {
+    const user = await meService(req.user!.userId);
+    res.status(200).json(user);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
 }

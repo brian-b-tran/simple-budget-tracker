@@ -13,6 +13,7 @@ import SimpleProgress from '../ui/simpleProgress';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/app/types/navigationTypes';
+import { formatCurrency } from '../../utils/currencyUtils';
 
 interface BudgetCardProps {
   budget: BudgetSummary;
@@ -56,12 +57,14 @@ export default function BudgetCard({ budget }: BudgetCardProps) {
         <CardContent>
           <SimpleProgress value={budget.percentageUsed} />
           <Text>
-            Spent: ${budget.totalSpent.toFixed(2)} of $
-            {budget.totalAmount.toFixed(2)}
+            Spent: {formatCurrency(budget.totalSpent, budget.currency)} of{' '}
+            {formatCurrency(budget.totalAmount, budget.currency)}
           </Text>
         </CardContent>
         <CardFooter>
-          <Text>Remaining: ${budget.remaining.toFixed(2)}</Text>
+          <Text>
+            Remaining: {formatCurrency(budget.remaining, budget.currency)}
+          </Text>
         </CardFooter>
       </Card>
     </TouchableOpacity>

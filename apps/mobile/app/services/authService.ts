@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios';
 import api from './api';
+import { UserProfile } from '@expense-app/types';
 interface accessToken {
   access: string;
 }
@@ -64,6 +65,17 @@ export async function logoutService(): Promise<void> {
       { withCredentials: true }
     );
     console.log(response);
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message || 'An unexpected error occurred';
+    throw new Error(errorMessage);
+  }
+}
+
+export async function getUserProfile(): Promise<UserProfile> {
+  try {
+    const { data } = await api.get<UserProfile>(`/auth/me`);
+    return data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || 'An unexpected error occurred';

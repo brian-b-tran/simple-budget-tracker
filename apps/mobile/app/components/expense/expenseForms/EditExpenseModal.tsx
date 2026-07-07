@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {
+  currencyEntries,
   UpdateExpenseFrontendInput,
   updateExpenseFrontendSchema,
 } from '@expense-app/types';
@@ -28,6 +29,7 @@ import {
 } from '@react-native-community/datetimepicker';
 import { formatDate, formatTime } from '../../../utils/dateUtils';
 import { Expense } from '@/app/types/expenseTypes';
+
 interface EditExpenseModalProps {
   visible: boolean;
   onClose: () => void;
@@ -153,6 +155,38 @@ export default function EditExpenseModal({
           {errors.amountOriginal && (
             <Text className='pl-2 text-red-300'>
               {errors.amountOriginal.message}
+            </Text>
+          )}
+
+          {/*Currency field (inline with amount eventually)*/}
+          <Controller
+            control={control}
+            name='currencyOriginal'
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View
+                style={{
+                  backgroundColor: 'white',
+                  borderWidth: 1,
+                  borderColor: '#e2e8f0',
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                }}
+              >
+                <Picker selectedValue={value} onValueChange={onChange}>
+                  {currencyEntries.map(([code, name]) => (
+                    <Picker.Item
+                      key={code}
+                      label={`${code} - ${name}`}
+                      value={code}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            )}
+          />
+          {errors.currencyOriginal && (
+            <Text className='pl-2 text-red-300'>
+              {errors.currencyOriginal.message}
             </Text>
           )}
         </View>
@@ -290,7 +324,7 @@ export default function EditExpenseModal({
         <TouchableOpacity activeOpacity={1}>
           <View
             className='bg-white rounded-t-3xl p-6'
-            style={{ minHeight: '80%' }}
+            style={{ minHeight: '90%' }}
           >
             <View className='flex-row justify-between items-center'>
               <Text className='text-lg font-bold text-slate-800'>

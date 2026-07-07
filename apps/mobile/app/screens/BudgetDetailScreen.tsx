@@ -21,6 +21,7 @@ import { Expense, ExpenseGroup } from '../types/expenseTypes';
 import { groupExpenses } from '../utils/transactionGrouping';
 import ExpenseRow from '../components/expense/ExpenseRow';
 import EditBudgetModal from '../components/budget/budgetForms/EditBudgetModal';
+import { formatCurrency } from '../utils/currencyUtils';
 type BudgetDetailRouteProp = RouteProp<RootStackParamList, 'BudgetDetail'>;
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -128,13 +129,16 @@ export default function BudgetDetailScreen() {
           {/*Details */}
           <View className='flex center p-6 bg-white rounded-xl'>
             <Text className='text-lg font-bold text-slate-800'>
-              Spent: ${budgetDetail.totalSpent.toFixed(2)} of $
-              {budgetDetail.totalAmount.toFixed(2)}
+              Spent:
+              {formatCurrency(budgetDetail.totalSpent, budgetDetail.currency)}
+              of
+              {formatCurrency(budgetDetail.totalAmount, budgetDetail.currency)}
             </Text>
             <SimpleProgress value={budgetDetail.percentageUsed} />
 
             <Text className='text-lg font-bold text-slate-800 mt-2'>
-              ${budgetDetail.remaining.toFixed(2)} remaining.
+              {formatCurrency(budgetDetail.remaining, budgetDetail.currency)}
+              remaining.
             </Text>
           </View>
 
@@ -153,7 +157,7 @@ export default function BudgetDetailScreen() {
                         {cat.categoryName}
                       </Text>
                       <Text className='text-slate-600 ml-auto'>
-                        ${cat.spent.toFixed(2)} (%
+                        {formatCurrency(cat.spent, budgetDetail.currency)} (%
                         {cat.percentageOfTotal.toFixed(1)})
                       </Text>
                     </View>

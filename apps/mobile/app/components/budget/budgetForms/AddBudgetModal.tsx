@@ -3,6 +3,7 @@ import { formatDate, formatTime } from '@/app/utils/dateUtils';
 import {
   CreateBudgetFrontendInput,
   createBudgetFrontendSchema,
+  currencyEntries,
 } from '@expense-app/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -89,10 +90,7 @@ export default function AddBudgetModal({
         onPress={onClose}
       >
         <TouchableOpacity activeOpacity={1}>
-          <View
-            className='bg-white rounded-t-3xl p-6'
-            style={{ minHeight: '80%' }}
-          >
+          <View className='bg-white p-6' style={{ minHeight: '100%' }}>
             <View className='flex-row justify-between items-center'>
               <Text className='text-lg font-bold text-slate-800'>
                 Add Budget
@@ -178,8 +176,12 @@ export default function AddBudgetModal({
                             selectedValue={value}
                             onValueChange={onChange}
                           >
-                            {currencies.map((cur) => (
-                              <Picker.Item key={cur} label={cur} value={cur} />
+                            {currencyEntries.map(([code, name]) => (
+                              <Picker.Item
+                                key={code}
+                                label={`${code} - ${name}`}
+                                value={code}
+                              />
                             ))}
                           </Picker>
                         </View>

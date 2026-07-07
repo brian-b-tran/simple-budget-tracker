@@ -1,4 +1,4 @@
-import { User } from '../../generated/prisma/client';
+import { User } from '../types/user';
 import prisma from '../config/db';
 import bcrypt from 'bcrypt';
 import {
@@ -8,6 +8,7 @@ import {
 } from '../utils/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { defaultCategories } from '../constants/categories';
+import { UserProfile } from '@expense-app/types';
 
 export async function registerUserService(
   email: string,
@@ -151,4 +152,19 @@ export async function logoutAllUserService(
       revokedAt: new Date(),
     },
   });
+}
+
+export async function meService(userId: string): Promise<UserProfile> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      currency: true,
+    },
+  });
+  if (!user) {
+    throw new Error('Could not find this user.');
+  }
+  return user;
 }

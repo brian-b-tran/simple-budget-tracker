@@ -62,7 +62,6 @@ export function useExpenses() {
       }
 
       setFilters((prev) => ({ ...prev, page: nextPage }));
-      console.log(`Items Loaded: PaginatedExpenses: ${expenses.data.length}`);
       setRecentExpenses((prev) => ({
         ...expenses,
         data: [...(prev?.data ?? []), ...expenses.data],
@@ -89,10 +88,6 @@ export function useExpenses() {
       });
       setFilters((prev) => ({ ...prev, page: 1 }));
       setRecentExpenses(expenses);
-
-      console.log(
-        `Expenses Loaded: PaginatedExpenses: ${expenses.data.length}`
-      );
     } catch (error: any) {
       const errorMsg = error.message
         ? error.message

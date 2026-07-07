@@ -44,7 +44,6 @@ export function useRecurringExpenses() {
       }
 
       setFilters((prev) => ({ ...prev, page: nextPage }));
-      console.log(`Items Loaded: PaginatedExpenses: ${expenses.data.length}`);
       setRecurringExpenses((prev) => ({
         ...expenses,
         data: [...(prev?.data ?? []), ...expenses.data],
@@ -71,10 +70,6 @@ export function useRecurringExpenses() {
       });
       setFilters((prev) => ({ ...prev, page: 1 }));
       setRecurringExpenses(expenses);
-
-      console.log(
-        `Recurring Expenses Loaded: PaginatedExpenses: ${expenses.data.length}`
-      );
     } catch (error: any) {
       const errorMsg = error.message
         ? error.message
