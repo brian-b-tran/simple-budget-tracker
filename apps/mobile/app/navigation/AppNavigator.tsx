@@ -9,6 +9,7 @@ import ExpenseDetailScreen from '../screens/ExpenseDetailScreen';
 import { RootStackParamList } from '../types/navigationTypes';
 import RecurringExpenseDetailScreen from '../screens/RecurringExpenseDetailScreen';
 import BudgetDetailScreen from '../screens/BudgetDetailScreen';
+import ReminderDetailScreen from '../screens/ReminderDetailScreen';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootStack() {
@@ -42,6 +43,10 @@ export function RootStack() {
 
             <Stack.Screen name='BudgetDetail' options={{ title: 'Details' }}>
               {() => <BudgetDetailScreen />}
+            </Stack.Screen>
+
+            <Stack.Screen name='ReminderDetail' options={{ title: 'Details' }}>
+              {() => <ReminderDetailScreen />}
             </Stack.Screen>
           </>
         ) : (

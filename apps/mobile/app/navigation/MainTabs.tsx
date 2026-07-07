@@ -3,7 +3,7 @@ import BudgetsScreen from '../screens/BudgetsScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import ExpensesScreen from '../screens/ExpensesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import ReminderScreen from '../screens/RemindersScreen';
+import CalendarScreen from '../screens/CalendarScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { TouchableOpacity, View, Text } from 'react-native';
 import AddExpenseModal from '../components/expense/expenseForms/AddExpenseModal';
@@ -20,7 +20,7 @@ function MainTabs({ onLogout }: MainTabsProps) {
         <Tab.Screen name='Dashboard'>{() => <DashboardScreen />}</Tab.Screen>
         <Tab.Screen name='Budgets'>{() => <BudgetsScreen />}</Tab.Screen>
         <Tab.Screen name='Expenses'>{() => <ExpensesScreen />}</Tab.Screen>
-        <Tab.Screen name='Reminders'>{() => <ReminderScreen />}</Tab.Screen>
+        <Tab.Screen name='Calendar'>{() => <CalendarScreen />}</Tab.Screen>
         <Tab.Screen name='Profile'>
           {() => <ProfileScreen onLogout={onLogout} />}
         </Tab.Screen>

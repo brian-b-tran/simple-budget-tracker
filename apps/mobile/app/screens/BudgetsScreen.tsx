@@ -92,6 +92,9 @@ export default function BudgetsScreen() {
       <AddBudgetModal
         visible={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
+        onSuccess={() => {
+          setCreateModalOpen(false);
+        }}
       ></AddBudgetModal>
     </SafeAreaView>
   );
