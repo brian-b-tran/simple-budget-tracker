@@ -150,28 +150,56 @@ export async function getAllBudgetSummariesService(
   return budgetSummaryArray;
 }
 
+//some real duplication smell here differentiating and validating from EVENT and VACATION types
 export async function createBudgetService(
   userId: string,
   budgetData: CreateBudgetBackendInput
 ): Promise<Budget> {
   if (
     budgetData.type === 'VACATION' &&
-    budgetData.startDate &&
-    budgetData.endDate
+    (!budgetData.startDate || !budgetData.endDate)
   ) {
+    throw new Error('This Vacation Budget does not have a start date.');
+  }
+
+  if (
+    budgetData.type === 'EVENT' &&
+    (!budgetData.startDate || !budgetData.endDate)
+  ) {
+    throw new Error('This Event Budget does not have a start date.');
+  }
+
+  if (budgetData.type === 'VACATION') {
     const overlappingBudget = await prisma.budget.findFirst({
       where: {
         userId: userId,
         type: 'VACATION',
         AND: [
-          { startDate: { lt: budgetData.endDate } },
-          { endDate: { gt: budgetData.startDate } },
+          { startDate: { lt: budgetData.endDate || undefined } },
+          { endDate: { gt: budgetData.startDate || undefined } },
         ],
       },
     });
 
     if (overlappingBudget) {
       throw new Error('This Vacation Budget overlaps with another.');
+    }
+  }
+
+  if (budgetData.type === 'EVENT') {
+    const overlappingBudget = await prisma.budget.findFirst({
+      where: {
+        userId: userId,
+        type: 'EVENT',
+        AND: [
+          { startDate: { lt: budgetData.endDate || undefined } },
+          { endDate: { gt: budgetData.startDate || undefined } },
+        ],
+      },
+    });
+
+    if (overlappingBudget) {
+      throw new Error('This Event Budget overlaps with another.');
     }
   }
 
@@ -193,6 +221,7 @@ export async function createBudgetService(
   return newBudget;
 }
 
+//some real duplication smell here differentiating and validating from EVENT and VACATION types
 export async function updateBudgetService(
   userId: string,
   budgetId: string,
@@ -205,19 +234,41 @@ export async function updateBudgetService(
     throw new Error('Could not find this Budget.');
   }
 
+  const newBudget = {
+    name: budgetData.name ?? oldBudget.name,
+    type: budgetData.type ?? oldBudget.type,
+    currency: budgetData.currency ?? oldBudget.currency,
+    totalAmount: budgetData.totalAmount ?? oldBudget.totalAmount,
+    startDate: budgetData.startDate ?? oldBudget.startDate,
+    endDate: budgetData.endDate ?? oldBudget.endDate,
+    startTime: budgetData.startTime ?? oldBudget.startTime,
+    endTime: budgetData.endTime ?? oldBudget.endTime,
+    notes: budgetData.notes ?? oldBudget.notes,
+  };
+
   if (
-    budgetData.type === 'VACATION' &&
-    budgetData.startDate &&
-    budgetData.endDate
+    newBudget.type === 'VACATION' &&
+    (!newBudget.startDate || !newBudget.endDate)
   ) {
+    throw new Error('This Vacation Budget does not have a start date.');
+  }
+
+  if (
+    newBudget.type === 'EVENT' &&
+    (!newBudget.startDate || !newBudget.endDate)
+  ) {
+    throw new Error('This Event Budget does not have a start date.');
+  }
+
+  if (newBudget.type === 'VACATION') {
     const overlappingBudget = await prisma.budget.findFirst({
       where: {
         userId: userId,
         type: 'VACATION',
         id: { not: budgetId },
         AND: [
-          { startDate: { lt: budgetData.endDate } },
-          { endDate: { gt: budgetData.startDate } },
+          { startDate: { lt: newBudget.endDate || undefined } },
+          { endDate: { gt: newBudget.startDate || undefined } },
         ],
       },
     });
@@ -227,18 +278,44 @@ export async function updateBudgetService(
     }
   }
 
+  if (newBudget.type === 'EVENT') {
+    const overlappingBudget = await prisma.budget.findFirst({
+      where: {
+        userId: userId,
+        type: 'EVENT',
+        id: { not: budgetId },
+        AND: [
+          { startDate: { lt: newBudget.endDate || undefined } },
+          { endDate: { gt: newBudget.startDate || undefined } },
+        ],
+      },
+    });
+
+    if (overlappingBudget) {
+      throw new Error('This Event Budget overlaps with another.');
+    }
+  }
+
   const updatedBudget = await prisma.budget.update({
     where: { id: budgetId, userId: userId },
     data: {
-      ...(budgetData.name && { name: budgetData.name }),
-      ...(budgetData.type && { type: budgetData.type }),
-      ...(budgetData.currency && { currency: budgetData.currency }),
-      ...(budgetData.totalAmount && { totalAmount: budgetData.totalAmount }),
-      ...(budgetData.startDate && { startDate: budgetData.startDate }),
-      ...(budgetData.endDate && { endDate: budgetData.endDate }),
-      ...(budgetData.startTime && { startTime: budgetData.startTime }),
-      ...(budgetData.endTime && { endTime: budgetData.endTime }),
-      ...(budgetData.notes && { notes: budgetData.notes }),
+      ...(budgetData.name !== undefined && { name: budgetData.name }),
+      ...(budgetData.type !== undefined && { type: budgetData.type }),
+      ...(budgetData.currency !== undefined && {
+        currency: budgetData.currency,
+      }),
+      ...(budgetData.totalAmount !== undefined && {
+        totalAmount: budgetData.totalAmount,
+      }),
+      ...(budgetData.startDate !== undefined && {
+        startDate: budgetData.startDate,
+      }),
+      ...(budgetData.endDate !== undefined && { endDate: budgetData.endDate }),
+      ...(budgetData.startTime !== undefined && {
+        startTime: budgetData.startTime,
+      }),
+      ...(budgetData.endTime !== undefined && { endTime: budgetData.endTime }),
+      ...(budgetData.notes !== undefined && { notes: budgetData.notes }),
     },
   });
 

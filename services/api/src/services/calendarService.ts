@@ -2,19 +2,19 @@ import prisma from '../config/db';
 import { CalendarEvent } from '../types/calendarEvent';
 
 export async function getCalendarFeedService(
-  userId: string
+  userId: string,
+  from: Date = new Date()
 ): Promise<Array<CalendarEvent>> {
   const [budgets, reminders] = await Promise.all([
-    await prisma.budget.findMany({
+    prisma.budget.findMany({
       where: {
         userId: userId,
         type: { in: ['VACATION', 'EVENT'] },
-        startDate: { not: null },
+        startDate: { gte: from },
       },
     }),
-    await prisma.reminder.findMany({
-      where: { userId: userId, dateTime: { gte: new Date() } },
-      orderBy: { dateTime: 'asc' },
+    prisma.reminder.findMany({
+      where: { userId: userId, dateTime: { gte: from } },
     }),
   ]);
 
@@ -27,7 +27,7 @@ export async function getCalendarFeedService(
         startDate: budget.startDate!,
         endDate: budget.endDate,
         metadata: {
-          totalAmount: budget.totalAmount,
+          totalAmount: Number(budget.totalAmount),
           currency: budget.currency,
           budgetType: budget.type,
         },
