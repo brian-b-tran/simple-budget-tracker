@@ -2,7 +2,6 @@
 ALTER TYPE "Frequency" RENAME TO "Frequency_old";
 CREATE TYPE "Frequency" AS ENUM ('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY');
 ALTER TABLE "RecurringExpense" ALTER COLUMN "frequency" TYPE "Frequency" USING "frequency"::text::"Frequency";
-ALTER TABLE "Reminder" ALTER COLUMN "recurrenceFrequency" TYPE "Frequency" USING "recurrenceFrequency"::text::"Frequency";
 DROP TYPE "Frequency_old";
 
 -- Create Reminder table
@@ -19,6 +18,10 @@ CREATE TABLE "Reminder" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "Reminder_pkey" PRIMARY KEY ("id")
 );
+
+
+
+
 
 -- Add foreign key
 ALTER TABLE "Reminder" ADD CONSTRAINT "Reminder_userId_fkey" 

@@ -80,7 +80,7 @@ export async function createBudgetController(
   try {
     const budgetData = createBudgetBackendSchema.safeParse(req.body);
     if (!budgetData.success) {
-      res.status(400).json({ message: budgetData.error });
+      res.status(400).json({ message: budgetData.error.message });
       return;
     }
     const newBudget = await createBudgetService(
@@ -108,7 +108,7 @@ export async function updateBudgetController(
     const budgetData = updateBudgetBackendSchema.safeParse(req.body);
     console.log('Backend All Budgets Endpoint Service hit.');
     if (!budgetData.success) {
-      res.status(400).json({ message: budgetData.error });
+      res.status(400).json({ message: budgetData.error.message });
       return;
     }
     const updatedBudget = await updateBudgetService(
