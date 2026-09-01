@@ -34,3 +34,8 @@ export interface CategoryBreakdown {
 export type BudgetDetail = BudgetSummary & {
   expenses: PaginatedResponse<Expense>;
 };
+
+export type VacationDayGroup = {
+  label: string;
+  expenses: Expense[];
+};
