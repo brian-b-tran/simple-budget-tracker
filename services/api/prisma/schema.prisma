@@ -84,6 +84,7 @@ model Expense {
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
   type               ExpenseType       @default(EXPENSE)
+  isCashPayment      Boolean           @default(true)
 }
 
 model ExchangeRate {
@@ -105,21 +106,20 @@ enum BudgetType {
 }
 
 model Budget {
-  id          String     @id @default(uuid())
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId      String
-  name        String
-  type        BudgetType
-  currency    String
-  totalAmount Decimal
-  startDate   DateTime?
-  endDate     DateTime?
-  startTime   DateTime?
-  endTime     DateTime?
-  notes       String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
+  id                String             @id @default(uuid())
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId            String
+  name              String
+  type              BudgetType
+  currency          String
+  totalAmount       Decimal
+  startDate         DateTime?
+  endDate           DateTime?
+  startTime         DateTime?
+  endTime           DateTime?
+  notes             String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
   expenses          Expense[]
   recurringExpenses RecurringExpense[]
 }

@@ -6,3 +6,8 @@ export type PaginatedExpenses = {
   limit: number;
   totalPages: number;
 };
+
+export type ExpenseGroup = {
+  label: string;
+  expenses: Expense[];
+};

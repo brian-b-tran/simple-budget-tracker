@@ -236,9 +236,16 @@ export async function getExpenseTotalsService(
         where: {
           userId,
           date: { gte: start, lte: end },
+          NOT: {
+            isCashPayment: true,
+            budget: {
+              type: 'VACATION',
+            },
+          },
         },
         _sum: { amountBase: true },
       });
+
       const income =
         res.find((x) => x.type === 'INCOME')?._sum.amountBase ??
         new Prisma.Decimal(0);

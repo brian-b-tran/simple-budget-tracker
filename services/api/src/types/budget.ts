@@ -1,5 +1,6 @@
 import { PaginatedResponse } from '@expense-app/types';
 import { Budget, Expense } from '../../generated/prisma/client';
+import { ExpenseGroup } from './expense';
 export type BudgetSummary = Budget & {
   totalSpent: number;
   remaining: number;
@@ -16,4 +17,18 @@ export type BudgetCategoryBreakdown = {
 
 export type BudgetDetail = BudgetSummary & {
   expenses: PaginatedResponse<Expense>;
+};
+
+export type VacationDailyBreakdown = {
+  startingCapital: number;
+  currency: string;
+  totalDays: number;
+  dayBuckets: VacationDayBucket[];
+};
+
+export type VacationDayBucket = {
+  dayLabel: string;
+  expenses: Expense[];
+  dayNetTotal: number;
+  dayBalance: number;
 };

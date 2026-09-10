@@ -102,13 +102,9 @@ export async function fetchAndStoreRates(
 
     return result;
   } catch (error) {
-    if (error instanceof Error) {
-      console.log(error.message);
-    } else {
-      throw new Error(
-        `Failed to fetch exchange rates: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
+    throw new Error(
+      `Failed to fetch exchange rates: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
   return [];
 }

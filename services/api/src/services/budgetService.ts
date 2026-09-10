@@ -1,5 +1,10 @@
 import prisma from '../config/db';
-import { Budget, Prisma } from '../../generated/prisma/client';
+import {
+  Budget,
+  BudgetType,
+  Expense,
+  Prisma,
+} from '../../generated/prisma/client';
 import {
   CreateBudgetBackendInput,
   UpdateBudgetBackendInput,
@@ -8,8 +13,13 @@ import type {
   BudgetSummary,
   BudgetCategoryBreakdown,
   BudgetDetail,
+  VacationDailyBreakdown,
+  VacationDayBucket,
 } from '../types/budget';
 import { filterExpenseService } from './expenseService';
+import { daysBetween } from '@expense-app/shared/utils/dateRanges';
+import { groupExpensesByVacationDay } from '../utils/transactionBucketing';
+import { ExpenseGroup } from '../types/expense';
 
 export async function getBudgetService(
   userId: string,
@@ -339,4 +349,64 @@ export async function deleteBudgetService(
   });
 
   return deletedBudget;
+}
+
+export async function getVacationDailyBreakdownService(
+  userId: string,
+  budgetId: string
+): Promise<VacationDailyBreakdown> {
+  const budget: Budget | null = await prisma.budget.findUnique({
+    where: { id: budgetId, userId: userId },
+  });
+  if (!budget) {
+    throw new Error('Could not find this budget.');
+  }
+  if (budget.type !== BudgetType.VACATION) {
+    throw new Error('This budget is not a Vacation Budget.');
+  }
+  if (!budget.startDate || !budget.endDate) {
+    throw new Error(
+      'This budget somehow has no startDate or endDate thats not legal.'
+    );
+  }
+
+  const expenses: Expense[] | null = await prisma.expense.findMany({
+    where: { budgetId: budgetId, userId: userId },
+  });
+  let startingBalance = Number(budget.totalAmount);
+
+  const expensesGroupedByDay: ExpenseGroup[] = groupExpensesByVacationDay(
+    expenses,
+    budget.startDate,
+    budget.endDate
+  );
+
+  const buckets: VacationDayBucket[] = expensesGroupedByDay.map((group) => {
+    let dayTotal = group.expenses.reduce((accumulator, expense) => {
+      if (expense.isCashPayment) {
+        if (expense.type === 'INCOME') {
+          return accumulator - Number(expense.amountOriginal);
+        }
+        return accumulator + Number(expense.amountOriginal);
+      }
+      return accumulator;
+    }, 0);
+    const newBalance = (startingBalance -= dayTotal);
+
+    return {
+      dayLabel: group.label,
+      expenses: group.expenses,
+      dayNetTotal: dayTotal,
+      dayBalance: newBalance,
+    };
+  });
+
+  const dailyBreakdown: VacationDailyBreakdown = {
+    startingCapital: Number(budget.totalAmount),
+    currency: budget.currency,
+    totalDays: daysBetween(budget.startDate!, budget.endDate!),
+    dayBuckets: buckets,
+  };
+
+  return dailyBreakdown;
 }
