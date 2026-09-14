@@ -19,6 +19,7 @@ export interface Expense {
   category?: { name: string };
   budget?: { name: string };
   recurringExpense?: { frequency: string; interval: number };
+  isCashPayment: boolean;
 }
 
 export interface ExpenseTotals {

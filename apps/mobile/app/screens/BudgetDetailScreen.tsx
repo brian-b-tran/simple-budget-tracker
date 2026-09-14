@@ -1,6 +1,11 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigationTypes';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {
   ActivityIndicator,
   Alert,
@@ -11,9 +16,13 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useEffect, useState } from 'react';
-import { deleteBudget, getBudgetDetail } from '../services/budgetService';
-import { BudgetDetail } from '../types/budgetTypes';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  deleteBudget,
+  getBudgetDetail,
+  getVacationBudgetBreakdown,
+} from '../services/budgetService';
+import { BudgetDetail, VacationDailyBreakdown } from '../types/budgetTypes';
 import SimpleProgress from '../components/ui/simpleProgress';
 import { Category } from '../types/categoryTypes';
 import { Progress } from '@/components/ui/progress';
@@ -35,12 +44,19 @@ export default function BudgetDetailScreen() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [groupedExpenses, setGroupedExpenses] = useState<ExpenseGroup[]>([]);
+  const [vacationBreakdown, setVacationBreakdown] =
+    useState<VacationDailyBreakdown>();
   const loadBudget = async () => {
     setIsLoading(true);
     try {
       const budget = await getBudgetDetail(budgetId);
       setBudgetDetail(budget);
-      setGroupedExpenses(groupExpenses(budget.expenses.data));
+      if (budget.type === 'VACATION') {
+        const vacationBudget = await getVacationBudgetBreakdown(budgetId);
+        setVacationBreakdown(vacationBudget);
+      } else {
+        setGroupedExpenses(groupExpenses(budget.expenses.data));
+      }
     } catch (error: any) {
       setErrorState(error.message);
     } finally {
@@ -79,9 +95,11 @@ export default function BudgetDetailScreen() {
     );
   };
 
-  useEffect(() => {
-    loadBudget();
-  }, [budgetId]);
+  useFocusEffect(
+    useCallback(() => {
+      loadBudget();
+    }, [budgetId, loadBudget])
+  );
 
   if (isLoading) {
     return (
@@ -174,31 +192,81 @@ export default function BudgetDetailScreen() {
               </Text>
             </View>
           )}
-
-          {groupedExpenses.length > 0 ? (
-            <View className='flex center p-6 bg-white rounded-xl'>
-              <Text className='text-2xl font-bold text-slate-800 text-center'>
-                Transactions in Budget
-              </Text>
-              <View>
-                {groupedExpenses.map((group) => (
-                  <View key={group.label}>
-                    <Text className='text-slate-500 font-semibold mt-4 mb-1 text-right'>
-                      {group.label}
-                    </Text>
-                    {group.expenses.map((expense) => (
-                      <ExpenseRow key={expense.id} expense={expense} />
+          {budgetDetail.type != 'VACATION' ? (
+            <>
+              {groupedExpenses.length > 0 ? (
+                <View className='flex center p-6 bg-white rounded-xl'>
+                  <Text className='text-2xl font-bold text-slate-800 text-center'>
+                    Transactions in Budget
+                  </Text>
+                  <View>
+                    {groupedExpenses.map((group) => (
+                      <View key={group.label}>
+                        <Text className='text-slate-500 font-semibold mt-4 mb-1 text-right'>
+                          {group.label}
+                        </Text>
+                        {group.expenses.map((expense) => (
+                          <ExpenseRow key={expense.id} expense={expense} />
+                        ))}
+                      </View>
                     ))}
                   </View>
-                ))}
-              </View>
-            </View>
+                </View>
+              ) : (
+                <View>
+                  <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+                    No Transactions in Budget Yet.
+                  </Text>
+                </View>
+              )}
+            </>
           ) : (
-            <View>
-              <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
-                No Transactions in Budget Yet.
-              </Text>
-            </View>
+            <>
+              {vacationBreakdown ? (
+                <View className='flex center p-6 bg-white rounded-xl'>
+                  <Text className='text-2xl font-bold text-slate-800 text-center'>
+                    {vacationBreakdown.totalDays} Total days in the Vacation.
+                  </Text>
+                  <Text className='text-2xl font-bold text-slate-800 text-center'>
+                    {formatCurrency(
+                      vacationBreakdown.startingCapital,
+                      vacationBreakdown.currency
+                    )}{' '}
+                    to spend.
+                  </Text>
+                  <View>
+                    {vacationBreakdown.dayBuckets.map((group) => (
+                      <View key={group.dayLabel}>
+                        <Text className='text-slate-500 font-semibold mt-4 mb-1 text-right'>
+                          {group.dayLabel} - spent:{' '}
+                          {formatCurrency(
+                            group.dayNetTotal,
+                            vacationBreakdown.currency
+                          )}
+                        </Text>
+                        {group.expenses.map((expense) => (
+                          <ExpenseRow key={expense.id} expense={expense} />
+                        ))}
+
+                        <Text className='text-slate-500 font-semibold mt-4 mb-1 text-right'>
+                          Balance after today:{' '}
+                          {formatCurrency(
+                            group.dayBalance,
+                            vacationBreakdown.currency
+                          )}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              ) : (
+                <View>
+                  <Text className='text-2xl font-bold text-slate-800 ml-6 mr-6 mt-4'>
+                    Vacation Breakdown could not be loaded.
+                  </Text>
+                </View>
+              )}
+            </>
           )}
         </View>
       </ScrollView>

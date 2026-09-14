@@ -7,6 +7,7 @@ import {
   updateBudgetService,
   deleteBudgetService,
   getBudgetDetailService,
+  getVacationDailyBreakdownService,
 } from '../services/budgetService';
 import {
   createBudgetBackendSchema,
@@ -140,6 +141,27 @@ export async function deleteBudgetController(
     );
 
     res.status(200).json(budget);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    } else {
+      res
+        .status(500)
+        .json({ message: 'Internal server error Budget endpoint.' });
+    }
+  }
+}
+
+export async function getVacationDailyBreakdownController(
+  req: Request,
+  res: Response
+): Promise<void> {
+  try {
+    const vacationDetail = await getVacationDailyBreakdownService(
+      req.user!.userId,
+      req.params.id as string
+    );
+    res.status(200).json(vacationDetail);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });

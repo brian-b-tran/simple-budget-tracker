@@ -35,7 +35,16 @@ export type BudgetDetail = BudgetSummary & {
   expenses: PaginatedResponse<Expense>;
 };
 
-export type VacationDayGroup = {
-  label: string;
+export type VacationDailyBreakdown = {
+  startingCapital: number;
+  currency: string;
+  totalDays: number;
+  dayBuckets: VacationDayBucket[];
+};
+
+export type VacationDayBucket = {
+  dayLabel: string;
   expenses: Expense[];
+  dayNetTotal: number;
+  dayBalance: number;
 };

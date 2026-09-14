@@ -1,4 +1,4 @@
-import { Expense, FormattedExpenseAmount } from '@/app/types/expenseTypes';
+import { Expense } from '@/app/types/expenseTypes';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Card, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { formatTime } from '@/app/utils/dateUtils';
@@ -7,8 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/app/types/navigationTypes';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '@/app/store/authContext';
-import { formatCurrency, formatExpenseAmount } from '@/app/utils/currencyUtils';
-import { useState } from 'react';
+import { formatExpenseAmount } from '@/app/utils/currencyUtils';
 
 interface ExpenseRowProps {
   expense: Expense;
@@ -40,6 +39,15 @@ export default function ExpenseRow({ expense }: ExpenseRowProps) {
                 <Text className='text-slate-400 text-sm'>
                   {amountConvertedString}
                 </Text>
+              )}
+              {expense.isCashPayment ? (
+                <></>
+              ) : (
+                <View className='px-2 py-0.5 rounded-full bg-indigo-100'>
+                  <Text className='text-xs font-semibold text-indigo-600'>
+                    Credit
+                  </Text>
+                </View>
               )}
             </CardTitle>
           </View>

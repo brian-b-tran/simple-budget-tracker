@@ -6,6 +6,7 @@ import {
   updateBudgetController,
   deleteBudgetController,
   getBudgetDetailController,
+  getVacationDailyBreakdownController,
 } from '../controllers/budgetController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
@@ -13,6 +14,11 @@ const budgetRouter = Router();
 budgetRouter.get('/', authMiddleware, getAllBudgetsController);
 budgetRouter.get('/:id', authMiddleware, getBudgetController);
 budgetRouter.get('/:id/detail', authMiddleware, getBudgetDetailController);
+budgetRouter.get(
+  '/:id/detail/vacation-breakdown',
+  authMiddleware,
+  getVacationDailyBreakdownController
+);
 budgetRouter.post('/', authMiddleware, createBudgetController);
 budgetRouter.put('/:id', authMiddleware, updateBudgetController);
 budgetRouter.delete('/:id', authMiddleware, deleteBudgetController);

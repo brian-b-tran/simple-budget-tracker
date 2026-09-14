@@ -2,7 +2,12 @@ import {
   CreateBudgetFrontendInput,
   UpdateBudgetFrontendInput,
 } from '@expense-app/types';
-import { Budget, BudgetDetail, BudgetSummary } from '../types/budgetTypes';
+import {
+  Budget,
+  BudgetDetail,
+  BudgetSummary,
+  VacationDailyBreakdown,
+} from '../types/budgetTypes';
 import { handleError } from '../utils/serviceUtils';
 import api from './api';
 
@@ -88,6 +93,19 @@ export const updateBudget = async (
 export const deleteBudget = async (budgetId: string): Promise<Budget> => {
   try {
     const { data } = await api.delete<Budget>(`/budgets/${budgetId}`);
+    return data;
+  } catch (error: any) {
+    return handleError(error);
+  }
+};
+
+export const getVacationBudgetBreakdown = async (
+  budgetId: string
+): Promise<VacationDailyBreakdown> => {
+  try {
+    const { data } = await api.get<VacationDailyBreakdown>(
+      `/budgets/${budgetId}/vacation-breakdown`
+    );
     return data;
   } catch (error: any) {
     return handleError(error);

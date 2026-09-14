@@ -19,9 +19,3 @@ export function formatTime(timeString: string): string {
   }).format(time);
   return timeFormatted;
 }
-
-export function daysBetween(a: Date, b: Date): number {
-  const aUTC = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-  const bUTC = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-  return Math.round((bUTC - aUTC) / 86400000);
-}
